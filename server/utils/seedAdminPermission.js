@@ -24,9 +24,8 @@ const PERMISSION_DEFINITIONS = [
     }
 ]
 
-// bcrypt כולל salt אקראי, ולכן hash של אותו שם משתנה בכל יצירה ואינו מתאים
-// לחיפוש או לאינדקס ייחודי. HMAC עם מפתח השרת דטרמיניסטי, ומאפשר לזהות
-// את הרשאת admin בלי לשמור את השם הגלוי ובלי לחשוף אותו בתשובות ה-API.
+// HMAC דטרמיניסטי משמש לאיתור הרשאות seed ולמניעת שמות כפולים.
+// השם עצמו נשמר כטקסט תצוגה; סיסמת ההרשאה נשארת מגובבת.
 const createNameLookup = name => createHmac("sha256", getJwtSecret())
     .update(name)
     .digest("hex")
@@ -77,6 +76,7 @@ const upsertPermission = async (definition, password) => {
     const existing = await Permission.findOne({ nameLookup }).select("+password").exec()
 
     if (existing) {
+        existing.name = definition.name
         existing.validActions = definition.validActions
         if (!existing.password || !(await verifyPassword(password, existing.password))) {
             existing.password = await hashPassword(password)
@@ -88,7 +88,7 @@ const upsertPermission = async (definition, password) => {
     try {
         return await Permission.create({
             id: await getNextPermissionId(),
-            name: await hashPassword(definition.name),
+            name: definition.name,
             nameLookup,
             password: await hashPassword(password),
             validActions: definition.validActions
@@ -99,6 +99,7 @@ const upsertPermission = async (definition, password) => {
         if (error.code === 11000) {
             const createdByAnotherInstance = await Permission.findOne({ nameLookup }).select("+password").exec()
             if (createdByAnotherInstance) {
+                createdByAnotherInstance.name = definition.name
                 createdByAnotherInstance.validActions = definition.validActions
                 if (!createdByAnotherInstance.password || !(await verifyPassword(password, createdByAnotherInstance.password))) {
                     createdByAnotherInstance.password = await hashPassword(password)

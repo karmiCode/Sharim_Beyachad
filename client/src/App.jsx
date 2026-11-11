@@ -23,6 +23,9 @@ import ProtectedRoute from "./ProtectedRoute"
 import "./App.css"
 import UpdateEmployee from "./Employee/UpdateEmployee"
 import ManageEmployies from "./Employee/ManageEmployies"
+import ManagePermission from "./Permission/ManagePermission"
+import PermissionDetails from "./Permission/PermissionDetails"
+import NewPermission from "./Permission/NewPermission"
 // ביטול או שמירה מוצלחת מפעילים onClose ומחזירים למסך העובד; בשגיאה הטופס נשאר פתוח,
 // כי AddEvent אינו מפעיל את ה־callback בכשל. replace מונע הוספת שלב להיסטוריה הישנה.
 function EmployeeAddEventRoute() {
@@ -114,6 +117,12 @@ function App() {
               <Route element={<ProtectedRoute permission="employees" />}>
                 <Route path="employees-manage" element={<ManageEmployies />} />
               </Route>
+              <Route element={<ProtectedRoute permissions={["permissions"]} />}>
+                <Route path="permissions-manage" element={<ManagePermission />} >
+                  <Route path="new" element={<NewPermission />} />
+                  <Route path=":permissionId/edit" element={<PermissionDetails />} />
+                </Route>
+              </Route>
               <Route element={<ProtectedRoute permission="events" />}>
                 <Route
                   path="add-event"
@@ -135,8 +144,9 @@ function App() {
               <Route path="add-event" element={<EmployeeAddEventRoute />} />
               <Route path="UpdateEvent/:eventId/edit" element={<ManageEvent />} />
             </Route>
+
             {/* שליפות האירוע, הרשומות והמתנדבות דורשות events, matching ו-employees בהתאמה. */}
-            <Route element={<ProtectedRoute permissions={["events", "matching", "employees"]} />}>
+            <Route element={<ProtectedRoute permissions={["events", "matching"]} />}>
               <Route path="Matching/:eventId" element={<Matching />} />
             </Route>
           </Route>

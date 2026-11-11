@@ -3,7 +3,6 @@ const { createHmac } = require("crypto")
 const mongoose = require("mongoose")
 const Permission = require("../models/Permission")
 const { getJwtSecret } = require("../config/jwt")
-const { hashPassword } = require("../utils/password")
 
 const isBcryptHash = value => /^\$2[aby]\$\d{2}\$/.test(value)
 const createNameLookup = name => createHmac("sha256", getJwtSecret()).update(name).digest("hex")
@@ -42,11 +41,10 @@ const migratePermissionIds = async () => {
             let nameLookup = permission.nameLookup
             if (!isBcryptHash(name)) {
                 name = name.trim()
-                if (!name || Buffer.byteLength(name, "utf8") > 72) {
+                if (!name || name.length > 100) {
                     throw new Error(`Permission ${permission._id} has an invalid name`)
                 }
                 nameLookup = createNameLookup(name)
-                name = await hashPassword(name)
             } else if (!nameLookup) {
                 throw new Error(`Permission ${permission._id} has a hashed name without its uniqueness lookup`)
             }

@@ -85,6 +85,17 @@ const EmployeePA = () => {
             </NavLink>
           </Can>
 
+          <Can permission="permissions">
+            <NavLink
+              to="/personal/permissions-manage"
+              className={({ isActive }) =>
+                `parent-nav-link${isActive ? " active" : ""}`
+              }
+            >
+              ניהול הרשאות
+            </NavLink>
+          </Can>
+
           <button className="parent-nav-link" type="button" onClick={signOut}>
             יציאה
           </button>

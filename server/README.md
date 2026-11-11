@@ -176,8 +176,9 @@ Many Requests`, כוללת `retryAfterSeconds` ומגדירה כותרת `Retry-
 ```
 
 `name` ו־`password` הם שדות חובה. השם מוסר מרווחים בתחילתו ובסופו ומוגבל
-ל־72 בתים ב־UTF-8, כמו מגבלת הקלט של bcrypt. הסיסמה גם היא מוגבלת ל־72
-בתים. שמות הרשאה ייחודיים לאחר הסרת הרווחים החיצוניים.
+ל־100 תווים. הוא נשמר כטקסט תצוגה ומוחזר בנתיבי ניהול ההרשאות המוגנים.
+הסיסמה מוגבלת ל־72 בתים ב־UTF-8 ונשמרת כ־bcrypt hash. שמות הרשאה ייחודיים
+לאחר הסרת הרווחים החיצוניים.
 
 ביצירה מוקצה `id` מספרי אוטומטי, החל מ־1 במסד נתונים חדש. אין לשלוח אותו
 בגוף הבקשה: השרת מחשב את הערך ושומר אותו. תשובת יצירה לדוגמה:
@@ -186,12 +187,13 @@ Many Requests`, כוללת `retryAfterSeconds` ומגדירה כותרת `Retry-
 {
   "_id": "מזהה MongoDB",
   "id": 1,
+  "name": "manager",
   "createdAt": "תאריך יצירה",
   "updatedAt": "תאריך עדכון"
 }
 ```
 
-השם והסיסמה אינם מוחזרים בתשובת ה־API.
+שם ההרשאה מוחזר רק בנתיבי הניהול המוגנים. סיסמת ההרשאה אינה מוחזרת.
 
 #### התחברות
 
@@ -232,11 +234,10 @@ Many Requests`, כוללת `retryAfterSeconds` ומגדירה כותרת `Retry-
 
 #### שמירת שם וסיסמה
 
-- `name` נשמר כ־bcrypt hash עם salt, ולא כטקסט גלוי.
+- `name` נשמר כטקסט תצוגה רגיל ומוחזר רק בנתיבי ניהול הרשאות מוגנים.
 - `password` נשמר גם הוא כ־bcrypt hash.
-- מאחר ש־bcrypt אינו מאפשר חיפוש לפי שם מקורי, `nameLookup` הוא HMAC-SHA256
-  יציב המבוסס על `JWT_SECRET`. הוא משמש לאכיפת ייחודיות השם, מוסתר מהתגובות
-  ואינו משמש להתחברות.
+- `nameLookup` הוא HMAC-SHA256 יציב המבוסס על `JWT_SECRET`. הוא משמש
+  לאכיפת ייחודיות השם ולאיתור הרשאות seed, מוסתר מהתגובות ואינו משמש להתחברות.
 - `id` הוא המזהה העסקי המשמש להתחברות. `_id` נשאר המזהה הפנימי של MongoDB
   ומשמש בנתיב הכללי `GET /permission/:id` ובעדכון ובמחיקה.
 - אין להחליף את `JWT_SECRET` בלי לתכנן מחדש את ערכי `nameLookup`; החלפה
@@ -288,8 +289,8 @@ Many Requests`, כוללת `retryAfterSeconds` ומגדירה כותרת `Retry-
 
 השדות המפורטים הם שמות השדות של ה־API וה־Mongoose. שדות `createdAt`,
 `updatedAt` נוצרים אוטומטית בכל המודלים שמפעילים timestamps. שדות
-`password`, `name` ו־`nameLookup` של הרשאה מוגדרים כשדות נסתרים במודל;
-ה־API מסיר גם שדות פרטיים מתשובותיו.
+`password` ו־`nameLookup` של הרשאה מוסתרים מה־API. שם ההרשאה גלוי רק בנתיבי
+ניהול הרשאות, המוגנים בהרשאת `permissions`.
 
 | משאב | שדות |
 |---|---|
@@ -300,7 +301,7 @@ Many Requests`, כוללת `retryAfterSeconds` ומגדירה כותרת `Retry-
 | `ChildEvent` | `child`, `event` (reference to `Event`), `volunteer`, `favoriteVolun` |
 | `VolunteerEvent` | `child`, `event`, `volunteer`, `notes`, `favouredChild` |
 | `Event` | `name`, `id`, `Children`, `sumOfChilds`, `SavedPlaces`, `isActive`, `Volunteers`, `date`, `startReg`, `endReg`, `hour`, `detailingForParent`, `detailingForVolun` |
-| `Permission` | `id`, `name` (hash), `nameLookup` (HMAC), `password` (hash), `validActions` (string array) |
+| `Permission` | `id`, `name` (plain display text), `nameLookup` (HMAC), `password` (hash), `validActions` (string array) |
 
 `POST /child-event` also accepts parent accounts for event registration. The
 request body contains `child`, `event`, and optional `favoriteVolun`; a parent
@@ -315,7 +316,7 @@ remain. The created `ChildEvent` reference is added to `Event.Children`.
 ObjectId של MongoDB.
 
 שדות נדרשים, ערכי enum ואילוצי ייחודיות נוספים מוגדרים בסכמות שבספריית
-`models`. לדוגמה: `Permission.name` ו־`Permission.id` ייחודיים; לעובד
+`models`. לדוגמה: `Permission.nameLookup` ו־`Permission.id` ייחודיים; לעובד
 נדרש `userName` ייחודי; לילד נדרשים `fullName` ייחודי ו־`phone`.
 
 ## הרשאות גישה ואסימונים
@@ -351,12 +352,20 @@ npm run migrate:permission-ids
 
 1. ממלאת `id` מספרי לרשומות הרשאה שחסר להן מזהה ומעדכנת את המונה כך שהערכים
    הבאים ימשיכו אחרי המזהה הגבוה ביותר.
-2. ממירה שם גלוי ל־bcrypt hash ומחשבת `nameLookup`.
+2. משאירה את שם ההרשאה כטקסט גלוי ומחשבת `nameLookup`.
 3. יוצרת אינדקסים ייחודיים ל־`id` ול־`nameLookup`.
 
-הפקודה לא יכולה לשחזר שם מקורי שכבר נשמר כ־bcrypt hash ללא `nameLookup`.
-במקרה כזה היא נעצרת עם שגיאה; יש לשחזר או לעדכן את שם ההרשאה ממקור אמין
-לפני ניסיון ההעברה. יש להשתמש באותו `JWT_SECRET` בכל ההעברה ולאחריה.
+### הסרת גיבוב משמות הרשאות קיימים
+
+```powershell
+npm run migrate:permission-names
+```
+
+יש להריץ פקודה זו פעם אחת לאחר `migrate:permission-ids` ולפני הפעלת הגרסה
+החדשה. היא ממירה שמות seed מוכרים (`admin`, `basic-`, `medium-`) לשמות גלויים.
+שם מותאם אישית שכבר נשמר כ־bcrypt hash אינו ניתן לשחזור, ולכן יוחלף בתווית
+זמנית `הרשאה <id>`. יש לגבות את מסד הנתונים לפני ההרצה ולהשתמש באותו
+`JWT_SECRET`, כדי לזהות את שמות ה־seed באמצעות `nameLookup`.
 
 ### הסרת שדה שם המשתמש הישן מהורים
 

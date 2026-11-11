@@ -6,7 +6,8 @@
     "start": "node server.js",
     "dev": "nodemon server",
     "migrate:parent-username": "node scripts/migrateParentUsername.js",
-    "migrate:permission-ids": "node scripts/migratePermissionIds.js"
+    "migrate:permission-ids": "node scripts/migratePermissionIds.js",
+    "migrate:permission-names": "node scripts/migratePermissionNames.js"
   },
   "keywords": [],
   "author": "",

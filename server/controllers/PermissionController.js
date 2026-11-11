@@ -9,12 +9,70 @@ const { getLoginLock, recordLoginFailure, clearLoginFailures } = require("../uti
 
 const VALID_ACTIONS = ["permissions", "employees", "events", "matching", "registation", "payments"]
 
-// bcrypt מייצר hash שונה בכל פעם בזכות salt אקראי, ולכן אין דרך לחפש לפי hash
-// של שם ידוע מראש או להשוות בין שני hash-ים כדי לבדוק אם השמות זהים.
-// לשם כך יוצרים HMAC דטרמיניסטי: אותו שם ואותו סוד יפיקו תמיד אותו ערך,
-// שאפשר לשמור באינדקס ייחודי. הערך אינו מאפשר להחזיר את השם המקורי,
-// והוא משמש רק למניעת שמות כפולים — ההתחברות מתבצעת לפי id.
-// ה-HMAC משתמש ב-JWT_SECRET, ולכן יש לשמור על אותו סוד כל עוד הנתונים קיימים.
+
+// employeeController.getAccessPermission = async (req, res) => {
+//     const { id } = req.params
+
+//     if (!mongoose.isValidObjectId(id)) {
+//         return res.status(400).json({ message: "נדרש מזהה עובד תקין" })
+//     }
+
+//     try {
+//         const employee = await Employee.findById(id).select("permission").lean()
+
+//         if (!employee) {
+//             return res.status(404).json({ message: "העובד/ת לא נמצא/ה" })
+//         }
+
+//         const permission = await Permission.findById(employee.permission)
+//             .select("validActions")
+//             .lean()
+
+//         if (!permission) {
+//             return res.status(404).json({ message: "הרשאת העובד/ת לא נמצאה" })
+//         }
+
+//         return res.json({ permissionId: String(permission._id) })
+//     } catch (error) {
+//         console.error("Failed to get employee access permission:", error)
+//         return res.status(500).json({ message: "טעינת הרשאת העובד/ת נכשלה" })
+//     }
+// }
+
+// employeeController.updateAccessPermission = async (req, res) => {
+//     const { id } = req.params
+//     const { permissionId } = req.body || {}
+
+//     if (!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(permissionId)) {
+//         return res.status(400).json({ message: "נדרש מזהה עובד והרשאה תקינים" })
+//     }
+
+//     try {
+//         const permissionExists = await Permission.exists({ _id: permissionId })
+
+//         if (!permissionExists) {
+//             return res.status(404).json({ message: "ההרשאה שנבחרה לא נמצאה" })
+//         }
+
+//         const employee = await Employee.findByIdAndUpdate(
+//             id,
+//             { $set: { permission: permissionId } },
+//             { new: true, runValidators: true },
+//         )
+
+//         if (!employee) {
+//             return res.status(404).json({ message: "העובד/ת לא נמצא/ה" })
+//         }
+
+//         return res.json({ message: "הרשאת העובד/ת עודכנה בהצלחה" })
+//     } catch (error) {
+//         console.error("Failed to update employee access permission:", error)
+//         return res.status(500).json({ message: "עדכון הרשאת העובד/ת נכשל" })
+//     }
+// }
+
+// ה-HMAC משמש רק לאיתור הרשאה ולמניעת שמות כפולים; name עצמו נשמר כטקסט תצוגה.
+// יש לשמור על אותו JWT_SECRET כדי שה-seed יוכל לזהות את ההרשאות המובנות.
 const createNameLookup = (name) => createHmac("sha256", getJwtSecret())
     .update(name)
     .digest("hex")
@@ -48,30 +106,24 @@ const getNextPermissionId = async () => {
     }
 }
 
-// מכין שדות הרשאה לפני שמירתם במסד הנתונים.
-// כשלא נשלח name, למשל בעדכון סיסמה בלבד, מחזירים את השדות ללא שינוי
-// כדי לא להצפין מחדש שם שכבר נשמר כ-hash.
-// כשנשלח name, מסירים רווחים חיצוניים, שומרים hash של bcrypt במקום השם הגלוי
-// ומחשבים מחדש HMAC לצורך בדיקת ייחודיות. ה-hash של הסיסמה אינו מחושב כאן:
-// ה-controller המשותף מבצע זאת באופן אחיד לכל המודלים שמגדירים passwordField.
+// מנרמל שם תצוגה ומחשב מפתח ייחודיות פנימי; סיסמת ההרשאה נשארת מגובבת בנפרד.
 const preparePermissionFields = async (fields) => {
     if (!("name" in fields)) return fields
     const name = fields.name.trim()
     return {
         ...fields,
-        name: await hashPassword(name),
+        name,
         nameLookup: createNameLookup(name)
     }
 }
 
 const permissionController = createModelController({
     model: Permission,
-    // name, password ו-validActions מתקבלים רק במסלול ניהול מוגן. id מוקצה בשרת, ו-nameLookup הוא
-    // שדה פנימי שנגזר מהשם; דחייתם מגינה מפני עקיפת הקצאת המזהים ובדיקת הייחודיות.
+    // name, password ו-validActions מתקבלים רק במסלול ניהול מוגן. id מוקצה בשרת,
+    // ו-nameLookup הוא שדה פנימי שנגזר מהשם.
     editableFields: ["name", "password", "validActions"],
-    // מסירים מהתשובות את hash השם, את ערך ה-HMAC ואת hash הסיסמה.
-    // גם אם שדות אלה נשלפו לצורך פעולה פנימית, הם לא ייחשפו ללקוח.
-    privateFields: ["name", "nameLookup", "password"],
+    // השם מוצג למנהלי הרשאות; מפתח החיפוש והסיסמה נשארים פרטיים.
+    privateFields: ["nameLookup", "password"],
     // מאפשר ל-controller המשותף לבצע hash לסיסמה ביצירה ובעדכון,
     // וכן לבדוק אותה מול ה-hash בעת התחברות.
     passwordField: "password",
@@ -86,17 +138,13 @@ const permissionController = createModelController({
         (typeof value === "string" && /^[1-9]\d*$/.test(value)),
     // שומרים id כמספר ב-MongoDB, לכן ממירים מחרוזת תקינה למספר לפני החיפוש.
     loginIdentifierLookup: value => Number(value),
-    // ולידציה מקדימה לשם: הוא חייב להיות מחרוזת לא ריקה אחרי trim,
-    // ובאורך של עד 72 בתים ב-UTF-8. זו מגבלת bcrypt; דוחים שם ארוך
-    // במפורש כדי שלא ייחתך או יתנגש עם שם אחר לאחר ההצפנה.
+    // שם תצוגה אינו סיסמה ולכן אינו כפוף למגבלת bcrypt.
     validateFields: (fields) => {
         if (
             "name" in fields &&
-            (typeof fields.name !== "string" ||
-                !fields.name.trim() ||
-                Buffer.byteLength(fields.name.trim(), "utf8") > 72)
+            (typeof fields.name !== "string" || !fields.name.trim() || fields.name.trim().length > 100)
         ) {
-            return "Name must be a non-empty string of at most 72 UTF-8 bytes"
+            return "Name must be a non-empty string of at most 100 characters"
         }
         if (
             "validActions" in fields &&
@@ -107,7 +155,7 @@ const permissionController = createModelController({
         }
         return null
     },
-    // הכנה זו משותפת ליצירה ולעדכון, כדי ששינוי שם יעדכן גם את ה-hash וגם את ה-HMAC.
+    // הכנה זו משותפת ליצירה ולעדכון, כדי ששינוי שם יעדכן גם את השם וגם את מפתח הייחודיות.
     prepareFields: preparePermissionFields,
     // לפני יצירה מכינים את השם ומקצים id חדש. ה-id אינו מתקבל מהלקוח
     // ואינו משתנה בעדכון, שבו משתמשים רק ב-prepareFields.
@@ -116,6 +164,27 @@ const permissionController = createModelController({
         id: await getNextPermissionId()
     })
 })
+
+permissionController.getAvailableActions = (req, res) => {
+    return res.json(VALID_ACTIONS)
+}
+
+permissionController.getNames = async (req, res) => {
+    try {
+        const permissions = await Permission.find()
+            .select("_id name")
+            .lean()
+
+        return res.json(
+            permissions.map(({ _id, name }) => ({ _id, name }))
+        )
+    } catch (error) {
+        console.error("Failed to load permission names:", error)
+        return res.status(500).json({
+            message: "טעינת שמות ההרשאות נכשלה",
+        })
+    }
+}
 
 // בודק בצד השרת אם הסיסמה תואמת להרשאה ייעודית לאחד מתפקידי העובדים.
 // הפעולה אינה מחזירה hash או שם הרשאה, אלא רק תפקיד מוכר לצורך ממשק ההרשמה.

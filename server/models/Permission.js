@@ -9,7 +9,8 @@ const permissionSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        select: false
+        trim: true,
+        maxlength: 100
     },
     nameLookup: {
         type: String,

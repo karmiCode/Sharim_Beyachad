@@ -87,13 +87,12 @@ const upsertPermission = async definition => {
         return existing
     }
 
-    const initialPassword = getPermissionPassword(definition)
     try {
         return await Permission.create({
             id: await getNextPermissionId(),
             name: definition.name,
             nameLookup,
-            password: await hashPassword(initialPassword),
+            password: await hashPassword(getPermissionPassword(definition)),
             validActions: definition.validActions
         })
     } catch (error) {
@@ -146,8 +145,8 @@ const migrateEmployeePermissions = async permissions => {
     )
 }
 
-// רץ בכל אתחול: יוצר הרשאות חסרות עם קודי האתחול מ-env, מסנכרן פעולות
-// בלי לדרוס קודים ששונו בממשק, ואז ממיר שיוכי עובדים ישנים ל-ObjectId references.
+// רץ בכל אתחול: יוצר הרשאות חסרות עם קודי ברירת המחדל מ-env, מסנכרן פעולות
+// בלי לדרוס קודים קיימים, ואז ממיר שיוכי עובדים ישנים ל-ObjectId references.
 const ensurePermissionSeeds = async () => {
     const permissions = []
 

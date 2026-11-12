@@ -3,15 +3,6 @@ import { useAuth } from "../useAuth"
 import Can from "../Can"
 import PageWrapper from "../layout/PageWrapper"
 
-const actionLabels = {
-  permissions: "ניהול הרשאות",
-  employees: "ניהול עובדים",
-  events: "ניהול אירועים",
-  matching: "שידוך ילדים ומתנדבים",
-  registation: "רישום עובדים",
-  payments: "ניהול תשלומים",
-}
-
 const EmployeePA = () => {
   const navigate = useNavigate()
   const location = useLocation()

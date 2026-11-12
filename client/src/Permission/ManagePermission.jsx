@@ -13,6 +13,13 @@ const ManagePermission = () => {
 
     const navigate = useNavigate()
 
+    const addPermission = (permission) => {
+        setPermissions((current) => [
+            ...current.filter((item) => item._id !== permission._id),
+            { _id: permission._id, name: permission.name },
+        ])
+    }
+
     useEffect(() => {
         let active = true
 
@@ -92,7 +99,7 @@ const ManagePermission = () => {
                 </div>
             )}
 
-            <Outlet />
+            <Outlet context={{ addPermission }} />
         </section>
     )
 }

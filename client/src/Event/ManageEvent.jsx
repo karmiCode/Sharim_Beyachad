@@ -193,8 +193,17 @@ function ManageEvent() {
                             />
                         </label>
                     </div>
-                    <button className="primary-button" type="submit" disabled={isSaving}>
-                        {isSaving ? "שומר..." : "שמירת שינויים"}
+                    <button
+                        className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
+                        type="submit"
+                        disabled={isSaving}
+                        aria-label={isSaving ? "שומר..." : "שמירת שינויים"}
+                        title={isSaving ? "שומר..." : "שמירת שינויים"}
+                    >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
+                            <path d="M17 21v-8H7v8M7 3v5h8" />
+                        </svg>
                     </button>
                 </form>
                 </>

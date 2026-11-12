@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const createModelController = require("./modelControllerFactory")
 const VolunteerEvent = require("../models/VolunEvent")
 const Event = require("../models/Event")
+const ChildEvent = require("../models/ChildEvent")
 
 // מגדיר CRUD עבור הקישור בין מתנדב לילד באירוע, כולל הערות והעדפת ילד.
 // בקר CRUD לקשר VolunteerEvent. הרשמה עצמית מטופלת בנתיבים הייעודיים למטה,
@@ -154,6 +155,7 @@ controller.registerForEvent = async (req, res) => {
  * שני תנאי הבעלות (event + volunteer מה-token) מבטיחים שהבקשה אינה יכולה
  * למחוק הרשמה של משתמש אחר. תחילה מוסרת ההפניה מהאירוע ואז נמחק מסמך הקשר.
  */
+
 controller.cancelEventRegistration = async (req, res) => {
     const eventId = req.body?.event
     const volunteerId = req.user?.id
@@ -162,49 +164,162 @@ controller.cancelEventRegistration = async (req, res) => {
         return res.status(400).json({ message: "נדרש מזהה אירוע תקין" })
     }
 
-    let registration
-    let eventReferenceUpdated = false
+    const createCancelError = (status, message) =>
+        Object.assign(new Error(message), { status })
+
+    let session
+
     try {
-        // החיפוש כולל את מזהה ה-JWT כדי שמתנדבת תוכל לבטל רק את הרישום שלה.
-        registration = await VolunteerEvent.findOne({
-            event: eventId,
-            volunteer: volunteerId
-        }).select("_id").lean()
-        if (!registration) {
-            return res.status(404).json({ message: "לא נמצאה הרשמה שלך לאירוע הזה" })
-        }
+        session = await mongoose.startSession()
 
-        const eventUpdate = await Event.updateOne(
-            { _id: eventId },
-            { $pull: { Volunteers: registration._id } }
-        )
-        eventReferenceUpdated = eventUpdate.matchedCount > 0
+        await session.withTransaction(async () => {
+            const registration = await VolunteerEvent.findOne({
+                event: eventId,
+                volunteer: volunteerId,
+            }).session(session)
 
-        // מוחקים את מסמך הקשר רק אחרי הסרת ההפניה אליו מהאירוע.
-        const deletion = await VolunteerEvent.deleteOne({
-            _id: registration._id,
-            volunteer: volunteerId
-        })
-        if (deletion.deletedCount !== 1) {
-            return res.status(404).json({ message: "ההרשמה כבר בוטלה" })
-        }
-
-        return res.json({ message: "ההרשמה לאירוע בוטלה בהצלחה" })
-    } catch (error) {
-        if (registration && eventReferenceUpdated) {
-            // אם המחיקה נכשלה, משיבים את ההפניה כדי למנוע רישום יתום/חלקי.
-            try {
-                await Event.updateOne(
-                    { _id: eventId },
-                    { $addToSet: { Volunteers: registration._id } }
-                )
-            } catch (rollbackError) {
-                console.error("Failed to restore event volunteer registration:", rollbackError)
+            if (!registration) {
+                throw createCancelError(404, "לא נמצאה הרשמה שלך לאירוע הזה")
             }
+
+            // אם אין קישור מצד המתנדבת, עדיין מחפשים קישור חד-צדדי מצד הילד.
+            const childRegistration = registration.child
+                ? await ChildEvent.findOne({
+                    _id: registration.child,
+                    event: eventId,
+                    volunteer: registration._id,
+                }).session(session)
+                : await ChildEvent.findOne({
+                    event: eventId,
+                    volunteer: registration._id,
+                }).session(session)
+
+            // קישור קיים מצד המתנדבת אך לא נמצאה התאמה תואמת מצד הילד.
+            if (registration.child && !childRegistration) {
+                throw createCancelError(
+                    409,
+                    "נמצאה אי-התאמה בשיבוץ. ההרשמה לא בוטלה; יש לפנות למנהלת."
+                )
+            }
+
+            if (childRegistration) {
+                const childUpdate = await ChildEvent.updateOne(
+                    {
+                        _id: childRegistration._id,
+                        event: eventId,
+                        volunteer: registration._id,
+                    },
+                    { $unset: { volunteer: 1 } },
+                    { session }
+                )
+
+                if (childUpdate.matchedCount !== 1) {
+                    throw createCancelError(
+                        409,
+                        "השיבוץ השתנה. יש לרענן ולנסות שוב."
+                    )
+                }
+            }
+
+            const eventUpdate = await Event.updateOne(
+                {
+                    _id: eventId,
+                    Volunteers: registration._id,
+                },
+                { $pull: { Volunteers: registration._id } },
+                { session }
+            )
+
+            if (eventUpdate.matchedCount !== 1) {
+                throw createCancelError(
+                    409,
+                    "רישום המתנדבת לא נמצא באירוע. ההרשמה לא בוטלה."
+                )
+            }
+
+            const deletion = await VolunteerEvent.deleteOne({
+                _id: registration._id,
+                event: eventId,
+                volunteer: volunteerId,
+            }).session(session)
+
+            if (deletion.deletedCount !== 1) {
+                throw createCancelError(409, "ההרשמה כבר בוטלה.")
+            }
+        })
+
+        return res.json({
+            message: "ההרשמה לאירוע בוטלה בהצלחה; אם היה שיבוץ, הוא בוטל גם כן.",
+        })
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ message: error.message })
         }
+
         console.error("Failed to cancel volunteer event registration:", error)
-        return res.status(500).json({ message: "ביטול ההרשמה לאירוע נכשל" })
+        return res.status(503).json({
+            message: "ביטול ההרשמה והשיבוץ נכשל. יש לנסות שוב.",
+        })
+    } finally {
+        if (session) {
+            await session.endSession().catch((error) => {
+                console.error("Failed to close cancellation session:", error)
+            })
+        }
     }
 }
+
+// controller.cancelEventRegistration = async (req, res) => {
+//     const eventId = req.body?.event
+//     const volunteerId = req.user?.id
+
+//     if (!mongoose.isValidObjectId(eventId)) {
+//         return res.status(400).json({ message: "נדרש מזהה אירוע תקין" })
+//     }
+
+//     let registration
+//     let eventReferenceUpdated = false
+//     try {
+//         // החיפוש כולל את מזהה ה-JWT כדי שמתנדבת תוכל לבטל רק את הרישום שלה.
+//         registration = await VolunteerEvent.findOne({
+//             event: eventId,
+//             volunteer: volunteerId
+//         }).select("_id").lean()
+//         if (!registration) {
+//             return res.status(404).json({ message: "לא נמצאה הרשמה שלך לאירוע הזה" })
+//         }
+
+//         const eventUpdate = await Event.updateOne(
+//             { _id: eventId },
+//             { $pull: { Volunteers: registration._id } }
+//         )
+//         eventReferenceUpdated = eventUpdate.matchedCount > 0
+
+//         // מוחקים את מסמך הקשר רק אחרי הסרת ההפניה אליו מהאירוע.
+//         const deletion = await VolunteerEvent.deleteOne({
+//             _id: registration._id,
+//             volunteer: volunteerId
+//         })
+//         if (deletion.deletedCount !== 1) {
+//             return res.status(404).json({ message: "ההרשמה כבר בוטלה" })
+//         }
+
+//         return res.json({ message: "ההרשמה לאירוע בוטלה בהצלחה" })
+//     } catch (error) {
+//         if (registration && eventReferenceUpdated) {
+//             // אם המחיקה נכשלה, משיבים את ההפניה כדי למנוע רישום יתום/חלקי.
+//             try {
+//                 await Event.updateOne(
+//                     { _id: eventId },
+//                     { $addToSet: { Volunteers: registration._id } }
+//                 )
+//             } catch (rollbackError) {
+//                 console.error("Failed to restore event volunteer registration:", rollbackError)
+//             }
+//         }
+//         console.error("Failed to cancel volunteer event registration:", error)
+//         return res.status(500).json({ message: "ביטול ההרשמה לאירוע נכשל" })
+//     }
+// }
 
 module.exports = controller

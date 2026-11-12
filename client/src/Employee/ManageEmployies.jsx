@@ -127,39 +127,54 @@ const ManageEmployies = () => {
                 <div>
                     {employees.map((employee) => (
                         <article className="parent-event-card" key={employee._id}>
-                            <h3>{employee.fullName}</h3>
+                            <h3 className="text-lg font-bold">{employee.fullName}</h3>
 
-                            <button
-                                className="secondary-button"
-                                type="button"
-                                onClick={() => {
-                                    setSelectedEmployee(employee)
-                                    setDialogMode("details")
-                                    setDialogError("")
-                                }}
-                            >
-                                צפייה בפרטים
-                            </button>
-
-                            <Can permission="permissions">
+                            <div className="flex items-center gap-2">
                                 <button
-                                    className="secondary-button"
+                                    className="secondary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
                                     type="button"
-                                    onClick={() => openPermissionDialog(employee)}
+                                    aria-label="צפייה בפרטי העובד"
+                                    title="צפייה בפרטי העובד"
+                                    onClick={() => {
+                                        setSelectedEmployee(employee)
+                                        setDialogMode("details")
+                                        setDialogError("")
+                                    }}
                                 >
-                                    שינוי הרשאת גישה
+                                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
                                 </button>
-                            </Can>
 
-                            <Can permission="employees">
-                                <button
-                                    className="secondary-button"
-                                    type="button"
-                                    onClick={() => handleDelete(employee)}
-                                >
-                                    מחיקת עובד
-                                </button>
-                            </Can>
+                                <Can permission="permissions">
+                                    <button
+                                        className="secondary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
+                                        type="button"
+                                        aria-label="שינוי הרשאת גישה"
+                                        title="שינוי הרשאת גישה"
+                                        onClick={() => openPermissionDialog(employee)}
+                                    >
+                                        <svg className="edit-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 2-1.66Z" />
+                                        </svg>
+                                    </button>
+                                </Can>
+
+                                <Can permission="employees">
+                                    <button
+                                        className="secondary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
+                                        type="button"
+                                        aria-label="מחיקת עובד"
+                                        title="מחיקת עובד"
+                                        onClick={() => handleDelete(employee)}
+                                    >
+                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                            <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </button>
+                                </Can>
+                            </div>
                         </article>
                     ))}
                 </div>
@@ -218,8 +233,7 @@ const ManageEmployies = () => {
                                         >
                                             {permissionOptions.map((permission) => (
                                                 <option key={permission._id} value={permission._id}>
-                                                    הרשאה {permission.id}:{" "}
-                                                    {(permission.validActions || []).join(", ") || "ללא הרשאות"}
+                                                    {permission.name}
                                                 </option>
                                             ))}
                                         </select>

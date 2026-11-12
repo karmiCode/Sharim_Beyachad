@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate, NavLink } from "react-router-dom"
 import { useAuth } from "../useAuth"
 import Can from "../Can"
+import PageWrapper from "../layout/PageWrapper"
 
 const actionLabels = {
   permissions: "ניהול הרשאות",
@@ -19,16 +20,14 @@ const EmployeePA = () => {
     logout()
     navigate("/", { replace: true })
   }
+  
   const returnToEmployeeHome = () => {
-    // במסך /personal כפתור הבית כבר נמצא בדף הבית; בנתיב משנה חוזרים לנתיב הבסיס.
-    if (location.pathname.startsWith("/EmployeePA/")) {
-      navigate("/EmployeePA", { replace: true })
-    }
+    navigate("/personal", { replace: true })
   }
 
   return (
-    <main className="page-shell" >
-      <section className="auth-card" dir="rtl">
+    <PageWrapper>
+      <section className="auth-card parent-area-card min-w-0 flex-1" dir="rtl">
         <button
           className="employee-home-button"
           type="button"
@@ -46,6 +45,10 @@ const EmployeePA = () => {
             {location.state.successMessage}
           </p>
         )}
+
+        <p>חשבון זה כולל הרשאות ניהול.</p>
+
+
         <nav className="parent-nav" aria-label="ניווט באזור האישי לעובד">
           <NavLink
             to="/personal/employee-details"
@@ -100,25 +103,13 @@ const EmployeePA = () => {
             יציאה
           </button>
         </nav>
-        <Can permission="permissions">
-          <p>חשבון זה כולל הרשאות ניהול.</p>
-        </Can>
-        <p>ההרשאות הפעילות בחשבון:</p>
-        {permissions.length > 0 ? (
-          <ul>
-            {permissions.map((action) => (
-              <Can permission={action} key={action}>
-                <li>{actionLabels[action] || action}</li>
-              </Can>
-            ))}
-          </ul>
-        ) : (
-          <p>לא הוגדרו פעולות מורשות לחשבון.</p>
-        )}
 
-        <Outlet />
+
+        <div className="parent-content min-w-0 w-full flex-1">
+          <Outlet />
+        </div>
       </section>
-    </main >
+    </PageWrapper>
   )
 
 }

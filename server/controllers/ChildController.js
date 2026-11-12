@@ -71,6 +71,51 @@ const controller = createModelController({
     ]
 })
 
+controller.updateImage = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "יש לבחור קובץ תמונה" })
+    }
+
+    let newImagePath
+    let imageSaved = false
+
+    try {
+        const child = await Child.findById(req.params.id)
+
+        if (!child) {
+            return res.status(404).json({ message: "הילד לא נמצא" })
+        }
+
+        const oldImagePath = child.img
+        newImagePath = await fileStorage.save(req.file)
+
+        child.img = newImagePath
+        await child.save()
+        imageSaved = true
+
+        if (oldImagePath) {
+            try {
+                await fileStorage.remove(oldImagePath)
+            } catch (error) {
+                console.error("Failed to remove replaced child image:", error)
+            }
+        }
+
+        return res.json({ img: child.img })
+    } catch (error) {
+        if (newImagePath && !imageSaved) {
+            try {
+                await fileStorage.remove(newImagePath)
+            } catch (cleanupError) {
+                console.error("Failed to remove an unsaved child image:", cleanupError)
+            }
+        }
+
+        console.error("Failed to update child image:", error)
+        return res.status(500).json({ message: "עדכון תמונת הילד נכשל" })
+    }
+}
+
 /**
  * מחליפה את getAll הכללית עבור הורה: מאמתת שהחשבון קיים ומסננת ב-MongoDB
  * לפי parent מתוך req.user, שנקבע מה-JWT ולא מגוף הבקשה.
@@ -470,7 +515,7 @@ controller.create = async (req, res) => {
         if (storedImagePath) {
             await fileStorage
                 .remove(storedImagePath)
-                .catch(() => {})
+                .catch(() => { })
         }
 
 

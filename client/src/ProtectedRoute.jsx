@@ -1,5 +1,5 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuth } from "./useAuth"
+import { Navigate, Outlet, useLocation, useOutletContext } from "react-router-dom"
 
 /**
  * שומר נתיב מפני משתמש לא מחובר או חסר הרשאה.
@@ -17,6 +17,7 @@ function ProtectedRoute({
   requireAll = true,
   loadingFallback,
 }) {
+  const outletContext = useOutletContext()
   const { isAuthenticated, loading, authError, refreshUser, role: currentRole, hasPermission } = useAuth()
   const location = useLocation()
 
@@ -53,7 +54,7 @@ function ProtectedRoute({
     return <Navigate to="/unauthorized" replace />
   }
 
-  return children || <Outlet />
+  return children || <Outlet context={outletContext} />
 }
 
 export default ProtectedRoute

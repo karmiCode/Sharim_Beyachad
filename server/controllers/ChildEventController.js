@@ -56,6 +56,36 @@ controller.checkRegistration = async (req, res) => {
     }
 }
 
+controller.getRegisteredChildrenForEvent = async (req, res) => {
+    const { event: eventId } = req.query
+    if (!mongoose.isValidObjectId(eventId)) {
+        return res.status(400).json({ message: "נדרש מזהה אירוע תקין" })
+    }
+
+    try {
+        const filter = { event: eventId }
+        if (req.user?.role === "Parent") {
+            const childIds = await Child.find({ parent: req.user.id }).distinct("_id")
+            if (childIds.length === 0) return res.json([])
+            filter.child = { $in: childIds }
+        }
+
+        const registrations = await ChildEvent.find(filter)
+            .select("child")
+            .populate({ path: "child", select: "_id fullName" })
+            .lean()
+
+        return res.json(
+            registrations
+                .filter(registration => registration.child)
+                .map(({ child }) => ({ _id: child._id, fullName: child.fullName }))
+        )
+    } catch (error) {
+        console.error("Failed to load registered children for event:", error)
+        return res.status(500).json({ message: "טעינת הילדים הרשומים לאירוע נכשלה" })
+    }
+}
+
 /**
  * POST /child-event יוצר רישום ילד לאירוע.
  * הורה יכול לרשום רק ילד ששייך אליו; עובד יכול לצרף שדה volunteer בהתאם

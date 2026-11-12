@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { api, getErrorMessage } from "../api"
 import { childFields } from "./RegChild"
 
@@ -18,6 +18,20 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
   const [fieldErrors, setFieldErrors] = useState({})
   const [errorMessage, setErrorMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState("")
+
+  const currentImageUrl = child.img
+    ? new URL(child.img, api.defaults.baseURL).toString()
+    : ""
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview)
+      }
+    }
+  }, [imagePreview])
   // const [toRead, setToRead] = useState(read ? true : false)
   const toRead = read ? true : false
 
@@ -60,8 +74,24 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
 
     setIsSubmitting(true)
     try {
-      const { data } = await api.patch(`/child/${child._id}`, payload)
-      onSuccess?.(data)
+      const { data: updatedChild } = await api.patch(
+        `/child/${child._id}`,
+        payload
+      )
+
+      if (selectedImage) {
+        const imageFormData = new FormData()
+        imageFormData.append("img", selectedImage)
+
+        const { data: imageResponse } = await api.patch(
+          `/child/${child._id}/image`,
+          imageFormData
+        )
+
+        Object.assign(updatedChild, imageResponse)
+      }
+
+      onSuccess?.(updatedChild)
     } catch (error) {
       const details = error.response?.data?.details
       if (details && typeof details === "object") {
@@ -87,7 +117,7 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
 
   return (
 
-    <form className="auth-card registration-card" onSubmit={handleSubmit} dir="rtl">
+    <form className="auth-card registration-card relative !pt-14" onSubmit={handleSubmit} dir="rtl">
 
       <h2>{read ? "פרטי ילד" : "עדכון פרטי ילד"} </h2>
       {parentEditableFields.map((field) => (
@@ -168,6 +198,32 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
           )}
         </div>
       ))}
+      <div className="form-field">
+        <label htmlFor="update-child-img">תמונת הילד/ה</label>
+
+        {(imagePreview || currentImageUrl) ? (
+          <img
+            className="file-preview"
+            src={imagePreview || currentImageUrl}
+            alt="תמונת הילד/ה"
+          />
+        ) : (
+          <p>לא נבחרה תמונה.</p>
+        )}
+
+        <input
+          id="update-child-img"
+          name="img"
+          type="file"
+          accept="image/*"
+          disabled={toRead || isSubmitting}
+          onChange={(event) => {
+            const file = event.target.files?.[0] || null
+            setSelectedImage(file)
+            setImagePreview(file ? URL.createObjectURL(file) : "")
+          }}
+        />
+      </div>
       {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
       {!toRead &&
         <button className="primary-button" type="submit" disabled={isSubmitting}>
@@ -175,12 +231,24 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
         </button>}
       {toRead && <>
         <button className="primary-button" type="button" onClick={confirmClick}>אישור</button>
-        <button onClick={updateClick} className="primary-button" type="button">עדכון פרטי הילד</button></>}
+        <button
+          onClick={updateClick}
+          className="primary-button !absolute !left-2 !top-2 !z-10 !h-8 !min-h-0 !w-8 !min-w-0 !rounded-md !p-1"
+          type="button"
+          aria-label="עדכון פרטי הילד"
+          title="עדכון פרטי הילד"
+        >
+          <svg className="edit-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 2-1.66Z" />
+          </svg>
+        </button>
+      </>}
       <button className="secondary-button" type="button" onClick={onCancel} disabled={isSubmitting}>
         ביטול
       </button>
     </form>
   )
+
 }
 
 export default UpdateChild

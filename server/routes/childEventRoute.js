@@ -19,6 +19,11 @@ router.post("/assign", matching, childEventController.assign)
 // ביטול שיבוץ דורש את אותה הרשאת matching ואת אותם מזהים שבהם משתמשת פעולת assign.
 router.post("/unassign", matching, childEventController.unassign)
 router.get(
+    "/registered-children",
+    requireRoleOrAction(["Parent"], "matching"),
+    childEventController.getRegisteredChildrenForEvent
+)
+router.get(
     "/check",
     // הגנה זהה ליצירה: middleware מתיר הורה או עובד מורשה; controller בודק בעלות ילד.
     requireRoleOrAction(["Parent"], "matching"),

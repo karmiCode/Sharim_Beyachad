@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../useAuth"
 import { api, getErrorMessage } from "../api"
@@ -27,9 +27,40 @@ const EventDetails = ({
     const [favouredChild, setFavouredChild] = useState("")
     const [volunteerRegistrationPending, setVolunteerRegistrationPending] = useState(false)
     const [volunteerRegistrationError, setVolunteerRegistrationError] = useState("")
+    const [registeredChildren, setRegisteredChildren] = useState([])
+    const [registeredChildrenLoading, setRegisteredChildrenLoading] = useState(false)
+    const [registeredChildrenError, setRegisteredChildrenError] = useState("")
     // const [volunteerRegistrationSuccess, setVolunteerRegistrationSuccess] = useState("")
     const { role } = useAuth()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        if (role !== "parent") {
+            setRegisteredChildren([])
+            setRegisteredChildrenError("")
+            setRegisteredChildrenLoading(false)
+            return undefined
+        }
+
+        let active = true
+        setRegisteredChildrenLoading(true)
+        setRegisteredChildrenError("")
+
+        api.get("/child-event/registered-children", { params: { event: event._id } })
+            .then(({ data }) => {
+                if (active) setRegisteredChildren(data)
+            })
+            .catch((error) => {
+                if (active) setRegisteredChildrenError(getErrorMessage(error))
+            })
+            .finally(() => {
+                if (active) setRegisteredChildrenLoading(false)
+            })
+
+        return () => {
+            active = false
+        }
+    }, [event._id, role])
 
     const registerForChild = (childId) => {
         setShowChildSelection(false)
@@ -111,6 +142,18 @@ const EventDetails = ({
             <p><strong>מחיר:</strong> {Number(event.price ?? 0).toLocaleString("he-IL", { style: "currency", currency: "ILS" })}</p>
 
                 <p><strong>פרטים להורים:</strong> {event.detailingForParent}</p>
+                {registeredChildrenLoading && <p role="status">בודק אילו ילדים רשומים...</p>}
+                {registeredChildrenError && (
+                    <p className="form-message error-message" role="alert">
+                        {registeredChildrenError}
+                    </p>
+                )}
+                {!registeredChildrenLoading && !registeredChildrenError && registeredChildren.length > 0 && (
+                    <p>
+                        <strong>ילדים הרשומים לאירוע:</strong>{" "}
+                        {registeredChildren.map((child) => child.fullName).join(", ")}
+                    </p>
+                )}
             </>}
             {/* אותו כרטיס מציג פרטים לשני התפקידים; כל פעולת רישום מוצגת רק לבעליה. */}
             {role === "volunteer" && (

@@ -77,6 +77,13 @@ router.route("/")
         return requireAction("matching")(req, res, next)
     }, childController.getAll)
     .post(verifyToken, upload.single("img"), requireChildCreate, childController.create)
+
+router.patch(
+    "/:id/image",
+    requireChildOwnerOrMatching,
+    upload.single("img"),
+    childController.updateImage
+)
 router.route("/:id")
     .get(requireChildOwnerOrMatching, childController.getById)
     .put(requireChildOwnerOrMatching, childController.update)

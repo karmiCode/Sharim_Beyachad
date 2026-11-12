@@ -3,7 +3,7 @@ const Permission = require("../models/Permission")
 const Employee = require("../models/Employee")
 const Counter = require("../models/Counter")
 const { getJwtSecret } = require("../config/jwt")
-const { hashPassword, isValidPassword, verifyPassword } = require("./password")
+const { hashPassword, isValidPassword } = require("./password")
 
 const PERMISSION_DEFINITIONS = [
     {
@@ -12,15 +12,17 @@ const PERMISSION_DEFINITIONS = [
         legacyPasswordEnv: "INITIAL_ADMIN_PASSWORD",
         validActions: ["permissions", "employees", "events", "matching", "registation", "payments"]
     },
+    
     {
-        name: "basic-",
-        passwordEnv: "BASIC_PERMISSION_PASSWORD",
-        validActions: ["registation"]
-    },
-    {
-        name: "medium-",
+        name: "medium",
         passwordEnv: "MEDIUM_PERMISSION_PASSWORD",
         validActions: ["registation", "events", "matching"]
+    },
+    
+    {
+        name: "basic",
+        passwordEnv: "BASIC_PERMISSION_PASSWORD",
+        validActions: ["registation"]
     }
 ]
 
@@ -71,26 +73,27 @@ const getPermissionPassword = definition => {
     return password
 }
 
-const upsertPermission = async (definition, password) => {
+const upsertPermission = async definition => {
     const nameLookup = createNameLookup(definition.name)
     const existing = await Permission.findOne({ nameLookup }).select("+password").exec()
 
     if (existing) {
         existing.name = definition.name
         existing.validActions = definition.validActions
-        if (!existing.password || !(await verifyPassword(password, existing.password))) {
-            existing.password = await hashPassword(password)
+        if (!existing.password) {
+            existing.password = await hashPassword(getPermissionPassword(definition))
         }
         await existing.save()
         return existing
     }
 
+    const initialPassword = getPermissionPassword(definition)
     try {
         return await Permission.create({
             id: await getNextPermissionId(),
             name: definition.name,
             nameLookup,
-            password: await hashPassword(password),
+            password: await hashPassword(initialPassword),
             validActions: definition.validActions
         })
     } catch (error) {
@@ -101,8 +104,8 @@ const upsertPermission = async (definition, password) => {
             if (createdByAnotherInstance) {
                 createdByAnotherInstance.name = definition.name
                 createdByAnotherInstance.validActions = definition.validActions
-                if (!createdByAnotherInstance.password || !(await verifyPassword(password, createdByAnotherInstance.password))) {
-                    createdByAnotherInstance.password = await hashPassword(password)
+                if (!createdByAnotherInstance.password) {
+                    createdByAnotherInstance.password = await hashPassword(getPermissionPassword(definition))
                 }
                 await createdByAnotherInstance.save()
                 return createdByAnotherInstance
@@ -143,14 +146,13 @@ const migrateEmployeePermissions = async permissions => {
     )
 }
 
-// רץ בכל אתחול: יוצר הרשאות חסרות, מסנכרן פעולות/סיסמאות מול env,
-// ואז מבצע מעבר בטוח של שיוכי העובדים הישנים ל-ObjectId references.
+// רץ בכל אתחול: יוצר הרשאות חסרות עם קודי האתחול מ-env, מסנכרן פעולות
+// בלי לדרוס קודים ששונו בממשק, ואז ממיר שיוכי עובדים ישנים ל-ObjectId references.
 const ensurePermissionSeeds = async () => {
-    const passwords = PERMISSION_DEFINITIONS.map(getPermissionPassword)
     const permissions = []
 
     for (let index = 0; index < PERMISSION_DEFINITIONS.length; index += 1) {
-        permissions.push(await upsertPermission(PERMISSION_DEFINITIONS[index], passwords[index]))
+        permissions.push(await upsertPermission(PERMISSION_DEFINITIONS[index]))
     }
 
     await migrateEmployeePermissions(permissions)

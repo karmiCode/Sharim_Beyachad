@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, NavLink, useNavigate } from "react-router-dom"
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../useAuth"
 import LogoMark from "./LogoMark"
 
@@ -76,6 +76,13 @@ function SiteHeader() {
   const navigate = useNavigate()
   const { isAuthenticated, role, hasPermission, logout, loading } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  // במסכי ההרשמה הציבוריים (הורה/מתנדב/עובד) מציגים תמיד תפריט אורח, גם אם בדפדפן
+  // נשארה התחברות קיימת. כך מי שנרשם/ת כעובד חדש/ה לא רואה את תפריט העובד לפני
+  // שסיים/ה הרשמה ולפני שנקבעו לו/ה הרשאות.
+  const isPublicRegistration = /^\/register\/(parent|volunteer|employee)\/?$/.test(pathname)
+  const showAsMember = isAuthenticated && !isPublicRegistration
 
   // Escape סוגר את התפריט הנפתח, כמו שמצופה מתפריט נגיש.
   useEffect(() => {
@@ -87,7 +94,7 @@ function SiteHeader() {
     return () => window.removeEventListener("keydown", closeOnEscape)
   }, [menuOpen])
 
-  const items = loading ? [] : getMenuItems({ isAuthenticated, role, hasPermission })
+  const items = loading ? [] : getMenuItems({ isAuthenticated: showAsMember, role, hasPermission })
   const closeMenu = () => setMenuOpen(false)
 
   const signOut = () => {
@@ -112,7 +119,7 @@ function SiteHeader() {
   ))
 
   // לאורח מוצג כפתור כניסה מודגש; למחובר מוצג כפתור יציאה עדין בוורוד.
-  const accountButton = loading ? null : isAuthenticated ? (
+  const accountButton = loading ? null : showAsMember ? (
     <button
       type="button"
       onClick={signOut}

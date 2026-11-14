@@ -1,11 +1,12 @@
 import { memo, useEffect, useState } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 import { permissionActionLabels } from "./permissionActions"
 
 const NewPermission = () => {
   const navigate = useNavigate()
-  const { addPermission } = useOutletContext()
   const [name, setName] = useState("")
   const [accessCode, setAccessCode] = useState("")
   const [availableActions, setAvailableActions] = useState([])
@@ -56,12 +57,11 @@ const NewPermission = () => {
 
     setIsSaving(true)
     try {
-      const { data } = await api.post("/permission", {
+      await api.post("/permission", {
         name: name.trim(),
         password: accessCode,
         validActions: enabledActions,
       })
-      addPermission(data)
       navigate("/personal/permissions-manage", { replace: true })
     } catch (error) {
       setErrorMessage(
@@ -75,7 +75,8 @@ const NewPermission = () => {
   }
 
   return (
-    <section dir="rtl">
+    <div className="page-shell">
+    <section dir="rtl" className="auth-card">
       <h2>הרשאה חדשה</h2>
 
       {errorMessage && (
@@ -84,7 +85,7 @@ const NewPermission = () => {
         </p>
       )}
 
-      <form className="auth-card" onSubmit={handleSubmit}>
+      <form className="registration-form-embedded" onSubmit={handleSubmit}>
         <div className="form-field">
           <label htmlFor="permission-name">שם ההרשאה</label>
           <input
@@ -141,8 +142,12 @@ const NewPermission = () => {
         >
           {isSaving ? "שומר..." : "אישור"}
         </button>
+        <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
+          <CancelIcon />
+        </IconButton>
       </form>
     </section>
+    </div>
   )
 }
 

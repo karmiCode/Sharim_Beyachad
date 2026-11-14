@@ -2,6 +2,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 /**
  * קומפוננטת הרשמה כללית להורה, מתנדב ועובד.
@@ -554,6 +556,10 @@ function RegistrationForm({
 
               שאר סוגי השדות מועברים כפי שהוגדרו.
             */}
+            <span
+              className={field.type === "file" ? "has-tooltip file-picker" : "contents"}
+              data-tooltip={field.type === "file" ? "בחירת קובץ" : undefined}
+            >
             <input
               id={field.name}
               name={field.name}
@@ -654,6 +660,7 @@ function RegistrationForm({
                 }))
               }}
             />
+            </span>
 
             {/* Preview מקומי מונע הצגת שם הקובץ במקום התמונה עצמה. */}
             {field.type === "file" && filePreviews[field.name] && (
@@ -711,13 +718,19 @@ function RegistrationForm({
         </button>
 
         {/* כפתור ניווט שאינו שולח את הטופס */}
-        <button
-          className="text-link"
-          type="button"
-          onClick={() => navigate(cancelPath || "/")}
-        >
-          {cancelPath ? "ביטול וחזרה לאזור האישי" : "חזרה להתחברות"}
-        </button>
+        {cancelPath ? (
+          <IconButton label="ביטול" onClick={() => navigate(cancelPath)}>
+            <CancelIcon />
+          </IconButton>
+        ) : (
+          <button
+            className="text-link"
+            type="button"
+            onClick={() => navigate("/")}
+          >
+            חזרה להתחברות
+          </button>
+        )}
 
       </form>
     </div>

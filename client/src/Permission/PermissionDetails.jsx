@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 const PermissionDetails = () => {
   const { permissionId } = useParams()
   const { state } = useLocation()
+  const navigate = useNavigate()
 
   const [permission, setPermission] = useState(null)
   const [actions, setActions] = useState([])
@@ -83,7 +86,8 @@ const PermissionDetails = () => {
   }
 
   return (
-    <section dir="rtl">
+    <div className="page-shell">
+    <section dir="rtl" className="auth-card">
       {loading && <p role="status">טוען פרטי הרשאה...</p>}
 
       {errorMessage && (
@@ -141,7 +145,11 @@ const PermissionDetails = () => {
           </button>
         </>
       )}
+      <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
+        <CancelIcon />
+      </IconButton>
     </section>
+    </div>
   )
 };
 

@@ -125,10 +125,9 @@ function App() {
                 <Route path="employees-manage" element={<ManageEmployies />} />
               </Route>
               <Route element={<ProtectedRoute permissions={["permissions"]} />}>
-                <Route path="permissions-manage" element={<ManagePermission />}>
-                  <Route path="new" element={<NewPermission />} />
-                  <Route path=":permissionId/edit" element={<PermissionDetails />} />
-                </Route>
+                <Route path="permissions-manage" element={<ManagePermission />} />
+                <Route path="permissions-manage/new" element={<NewPermission />} />
+                <Route path="permissions-manage/:permissionId/edit" element={<PermissionDetails />} />
               </Route>
               <Route element={<ProtectedRoute permission="events" />}>
                 <Route

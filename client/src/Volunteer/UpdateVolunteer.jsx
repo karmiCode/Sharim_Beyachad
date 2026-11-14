@@ -2,6 +2,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import { useAuth } from "../useAuth"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 /**
  * טופס עדכון הפרופיל של המתנדבת המחוברת.
@@ -143,14 +145,13 @@ const UpdateVolunteer = () => {
 
                 {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
                 <div className="volunteer-registration-actions">
-                    <button
-                        className="secondary-button"
-                        type="button"
+                    <IconButton
+                        label="ביטול"
                         onClick={() => navigate("/personal")}
                         disabled={isSubmitting}
                     >
-                        ביטול
-                    </button>
+                        <CancelIcon />
+                    </IconButton>
                     <button
                         className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
                         type="submit"

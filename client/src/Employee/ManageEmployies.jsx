@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { api, getErrorMessage } from "../api"
 import { useNavigate } from "react-router-dom"
 import Can from "../Can"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 const ManageEmployies = () => {
     const [employees, setEmployees] = useState([])
@@ -247,14 +249,13 @@ const ManageEmployies = () => {
                                 )}
 
                                 <div className="matching-confirm-actions">
-                                    <button
-                                        className="secondary-button"
-                                        type="button"
+                                    <IconButton
+                                        label="ביטול"
                                         onClick={closeDialog}
                                         disabled={isSavingPermission}
                                     >
-                                        ביטול
-                                    </button>
+                                        <CancelIcon />
+                                    </IconButton>
                                     <button
                                         className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
                                         type="button"

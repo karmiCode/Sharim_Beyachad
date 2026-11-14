@@ -31,6 +31,7 @@ function ParentChildEditPage() {
   return (
     <UpdateChild
       key={child._id}
+      embedded
       child={child}
       onCancel={() => navigate("/personal")}
       onSuccess={(updatedChild) => {

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import { api, getErrorMessage } from "../api"
 import { childFields } from "./RegChild"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 const parentEditableFields = childFields.filter(
   (field) => !["status", "category", "notes", "img"].includes(field.name)
 )
 
-const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
+const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit, embedded = false }) => {
   const [values, setValues] = useState(() =>
     Object.fromEntries(parentEditableFields.map((field) => {
       const value = child[field.name]
@@ -117,7 +119,13 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
 
   return (
 
-    <form className="auth-card registration-card relative !pt-14" onSubmit={handleSubmit} dir="rtl">
+    <form
+      className={embedded
+        ? "registration-card registration-form-embedded relative"
+        : "auth-card registration-card relative !pt-14"}
+      onSubmit={handleSubmit}
+      dir="rtl"
+    >
 
       <h2>{read ? "פרטי ילד" : "עדכון פרטי ילד"} </h2>
       {parentEditableFields.map((field) => (
@@ -211,20 +219,23 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
           <p>לא נבחרה תמונה.</p>
         )}
 
-        <input
-          id="update-child-img"
-          name="img"
-          type="file"
-          accept="image/*"
-          disabled={toRead || isSubmitting}
-          onChange={(event) => {
-            const file = event.target.files?.[0] || null
-            setSelectedImage(file)
-            setImagePreview(file ? URL.createObjectURL(file) : "")
-          }}
-        />
+        <span className="has-tooltip file-picker" data-tooltip="בחירת קובץ">
+          <input
+            id="update-child-img"
+            name="img"
+            type="file"
+            accept="image/*"
+            disabled={toRead || isSubmitting}
+            onChange={(event) => {
+              const file = event.target.files?.[0] || null
+              setSelectedImage(file)
+              setImagePreview(file ? URL.createObjectURL(file) : "")
+            }}
+          />
+        </span>
       </div>
       {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
+      <div className="flex items-center gap-2">
       {!toRead &&
         <button
           className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
@@ -252,9 +263,10 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit }) => {
           </svg>
         </button>
       </>}
-      <button className="secondary-button" type="button" onClick={onCancel} disabled={isSubmitting}>
-        ביטול
-      </button>
+      <IconButton label="ביטול" onClick={onCancel} disabled={isSubmitting}>
+        <CancelIcon />
+      </IconButton>
+      </div>
     </form>
   )
 

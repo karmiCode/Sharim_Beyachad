@@ -3,7 +3,8 @@
  * כאן רק הגדרות בסיס כלליות: משתנה גובה הכותרת, פונט וצבע טקסט.
  */
 :root {
-  --header-height: 76px;
+  --header-height: 64px;
+  font-size: 15px;
   font-family: var(--font-sans, "Rubik", Arial, sans-serif);
   color: var(--color-ink, #1b3d52);
   background: var(--color-cream-50, #fffdf8);

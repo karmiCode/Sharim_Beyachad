@@ -8,6 +8,8 @@ import CancelAssignmentModal from "./CancelAssignmentModal"
 import { cancelMatchingAssignment } from "./matchingService"
 import VolunEvent from "./VolunEvent"
 import VolunEventDet from "./VolunEventDet"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 // ממיר הפניה ממסד הנתונים למזהה אחיד; היא עשויה להגיע כמחרוזת או כמסמך מאוכלס.
 const getReferenceId = (reference) =>
@@ -635,14 +637,13 @@ function Matching() {
                         <p><strong>מתנדבת:</strong> {activeSelectedVolunteer.fullName}</p>
                         {saveError && <p className="form-message error-message" role="alert">{saveError}</p>}
                         <div className="matching-confirm-actions">
-                            <button
-                                className="secondary-button"
-                                type="button"
+                            <IconButton
+                                label="ביטול"
                                 disabled={isSaving}
                                 onClick={() => setIsConfirmOpen(false)}
                             >
-                                ביטול
-                            </button>
+                                <CancelIcon />
+                            </IconButton>
                             <button
                                 className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
                                 type="button"

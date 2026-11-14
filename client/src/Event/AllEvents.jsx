@@ -4,6 +4,8 @@ import { api, getErrorMessage } from "../api"
 import { useAuth } from "../useAuth"
 import EventDetails from "./EventDetails"
 import Can from "../Can"
+import IconButton from "../ui/IconButton"
+import { EyeIcon } from "../ui/icons"
 
 const AllEvents = ({
     selectedEventId,
@@ -76,13 +78,12 @@ const AllEvents = ({
                         )}
 
                         <Can permissions={["events", "matching", "employees"]}>
-                            <button
-                                className="secondary-button"
-                                type="button"
+                            <IconButton
+                                label="צפייה בילדים ובמתנדבות לאירוע"
                                 onClick={() => navigate(`/EmployeePA/Matching/${event._id}`)}
                             >
-                                צפייה בילדים ובמתנדבות לאירוע
-                            </button>
+                                <EyeIcon />
+                            </IconButton>
                         </Can>
 
                     </article>

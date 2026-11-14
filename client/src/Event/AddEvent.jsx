@@ -2,6 +2,8 @@
 import { useState } from "react"
 import { api, getErrorMessage } from "../api"
 import Can from "../Can"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 const AddEvent = ({ onClose }) => {
   const [errorMessage, setErrorMessage] = useState("")
@@ -207,9 +209,9 @@ const AddEvent = ({ onClose }) => {
     >
       <h1>יצירת אירוע</h1>
       {onClose && (
-        <button className="secondary-button" type="button" onClick={onClose}>
-          סגירת טופס האירוע
-        </button>
+        <IconButton label="סגירת טופס האירוע" onClick={onClose}>
+          <CancelIcon />
+        </IconButton>
       )}
 
       <div className="form-field">

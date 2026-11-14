@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../useAuth"
 import { api, getErrorMessage } from "../api"
 import RegChildToEvent from "../Child/RegChildToEvent"
+import IconButton from "../ui/IconButton"
+import { CancelIcon, CalendarXIcon, CalendarPlusIcon } from "../ui/icons"
 
 /**
  * כרטיס אירוע משותף לתצוגת הורה ומתנדבת, אבל פעולות ההרשמה מופרדות לפי role.
@@ -162,14 +164,14 @@ const EventDetails = ({
                 {/* state מקומי מעדכן מיד אחרי POST; בטעינה הבאה הערך מאותחל מתשובת השרת. */}
                 {volunteerRegistered ? (
                     <div className="volunteer-registration-status">
-                        <button
-                            className={`secondary-button volunteer-registration-button${volunteerRegistrationPending ? " is-pending" : ""}`}
-                            type="button"
+                        <IconButton
+                            label={volunteerRegistrationPending ? "מבטלת הרשמה..." : "ביטול הרשמה"}
+                            className={`volunteer-registration-button${volunteerRegistrationPending ? " is-pending" : ""}`}
                             onClick={cancelVolunteerRegistration}
                             disabled={volunteerRegistrationPending}
                         >
-                            {volunteerRegistrationPending ? "מבטלת הרשמה..." : "ביטול הרשמה"}
-                        </button>
+                            <CalendarXIcon />
+                        </IconButton>
                         <p className="form-message success-message" role="status">
                             נרשמת לאירוע.
                         </p>
@@ -199,24 +201,24 @@ const EventDetails = ({
                                 >
                                     {volunteerRegistrationPending ? "נרשמת..." : "שליחת הרשמה"}
                                 </button>
-                                <button
-                                    className="secondary-button"
-                                    type="button"
+                                <IconButton
+                                    label="ביטול"
                                     onClick={() => setShowVolunteerRegistrationForm(false)}
                                     disabled={volunteerRegistrationPending}
                                 >
-                                    ביטול
-                                </button>
+                                    <CancelIcon />
+                                </IconButton>
                             </div>
                         </form>
                     ) : (
-                        <button
-                            className="primary-button volunteer-registration-button"
-                            type="button"
+                        <IconButton
+                            variant="primary"
+                            label="הרשמה לאירוע"
+                            className="volunteer-registration-button"
                             onClick={() => setShowVolunteerRegistrationForm(true)}
                         >
-                            הרשמה לאירוע
-                        </button>
+                            <CalendarPlusIcon />
+                        </IconButton>
                     )
                 ) : (
                     <p>{event.volunteerRegistrationMessage}</p>
@@ -287,13 +289,9 @@ const EventDetails = ({
                                 {child.fullName}
                             </button>
                         ))}
-                        <button
-                            className="text-link"
-                            type="button"
-                            onClick={() => setShowChildSelection(false)}
-                        >
-                            ביטול
-                        </button>
+                        <IconButton label="ביטול" onClick={() => setShowChildSelection(false)}>
+                            <CancelIcon />
+                        </IconButton>
                     </section>
                 </div>
             )}

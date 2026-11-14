@@ -2,6 +2,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import { useAuth } from "../useAuth"
+import IconButton from "../ui/IconButton"
+import { CancelIcon } from "../ui/icons"
 
 const UpdateParent = () => {
     const { user, refreshUser } = useAuth()
@@ -67,9 +69,9 @@ const UpdateParent = () => {
             </div>
 
             {errorMessage && <p role="alert">{errorMessage}</p>}
-            <button className="secondary-button" type="button" onClick={() => navigate("/personal")}>
-                ביטול
-            </button>
+            <IconButton label="ביטול" onClick={() => navigate("/personal")}>
+                <CancelIcon />
+            </IconButton>
             <button
                 className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
                 type="submit"

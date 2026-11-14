@@ -35,7 +35,7 @@ function getMenuItems({ isAuthenticated, role, hasPermission }) {
       { to: "/personal/events", label: "אירועים" },
       { to: "/personal/reg-child", label: "רישום ילד" },
       { to: "/personal/children", label: "עדכון פרטי ילד" },
-      { to: "/personal/parent-details", label: "פרטי הורה" },
+      { to: "/personal/parent-details", label: "עדכון פרטי הורה" },
     ]
   }
 

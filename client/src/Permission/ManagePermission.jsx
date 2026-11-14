@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate, Outlet } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import Can from "../Can"
 
@@ -12,13 +12,6 @@ const ManagePermission = () => {
     const [errorMessage, setErrorMessage] = useState("")
 
     const navigate = useNavigate()
-
-    const addPermission = (permission) => {
-        setPermissions((current) => [
-            ...current.filter((item) => item._id !== permission._id),
-            { _id: permission._id, name: permission.name },
-        ])
-    }
 
     useEffect(() => {
         let active = true
@@ -71,7 +64,7 @@ const ManagePermission = () => {
             )}
 
             {!loading && !errorMessage && permissions.length > 0 && (
-                <div>
+                <div className="mt-4 grid gap-4">
                     {permissions.map((permission) => (
                         <article className="parent-event-card relative !pt-14" key={permission._id}>
                             <h3>{displayPermissionName(permission.name)}</h3>
@@ -98,8 +91,6 @@ const ManagePermission = () => {
                     ))}
                 </div>
             )}
-
-            <Outlet context={{ addPermission }} />
         </section>
     )
 }

@@ -5,6 +5,9 @@ const EmployeePA = () => {
   const navigate = useNavigate()
   const location = useLocation()
   
+  // הכותרת וההודעה הפותחת מוצגות רק במסך הבית של האזור האישי, לא בעמודי המשנה (אירועים וכו').
+  const isPersonalHome = ["/personal", "/EmployeePA"].includes(location.pathname.replace(/\/+$/, ""))
+
   const returnToEmployeeHome = () => {
     navigate("/personal", { replace: true })
   }
@@ -23,14 +26,14 @@ const EmployeePA = () => {
             <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" />
           </svg>
         </button>
-        <h1>האזור האישי לעובד</h1>
+        {isPersonalHome && <h1>האזור האישי לעובד</h1>}
         {location.state?.successMessage && (
           <p className="form-message success-message" role="status">
             {location.state.successMessage}
           </p>
         )}
 
-        <p>חשבון זה כולל הרשאות ניהול.</p>
+        {isPersonalHome && <p>חשבון זה כולל הרשאות ניהול.</p>}
 
 
         <div className="parent-content min-w-0 w-full flex-1">

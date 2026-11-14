@@ -35,6 +35,9 @@ function ParentPA() {
     }
   }, [location.state?.refreshChildren])
 
+  // הכותרת וההודעה הפותחת מוצגות רק במסך הבית של האזור האישי, לא בעמודי המשנה (אירועים וכו').
+  const isPersonalHome = ["/personal", "/EmployeePA"].includes(location.pathname.replace(/\/+$/, ""))
+
   const returnToPersonalHome = () => {
     navigate("/personal", { replace: true })
   }
@@ -43,7 +46,7 @@ function ParentPA() {
     <PageWrapper>
       <section className="auth-card parent-area-card min-w-0 flex-1" dir="rtl">
         <header className="parent-area-header">
-          <h1>האזור האישי</h1>
+          {isPersonalHome && <h1>האזור האישי</h1>}
           <button
             className="employee-home-button"
             type="button"
@@ -55,7 +58,9 @@ function ParentPA() {
               <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" />
             </svg>
           </button>
-          <p>התחברת בהצלחה ({role}). פרטי המשתמש נטענו לאחר אימות מול השרת.</p>
+          {isPersonalHome && (
+            <p>התחברת בהצלחה ({role}). פרטי המשתמש נטענו לאחר אימות מול השרת.</p>
+          )}
         </header>
         {(successMessage || location.state?.successMessage) && (
           <p className="form-message success-message" role="status">

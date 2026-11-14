@@ -9,6 +9,9 @@ function VolunteerPA() {
   const location = useLocation()
   const { user } = useAuth()
 
+  // הכותרת וההודעה הפותחת מוצגות רק במסך הבית של האזור האישי, לא בעמודי המשנה (אירועים וכו').
+  const isPersonalHome = ["/personal", "/EmployeePA"].includes(location.pathname.replace(/\/+$/, ""))
+
   const returnToPersonalHome = () => {
     navigate("/personal", { replace: true })
   }
@@ -17,7 +20,7 @@ function VolunteerPA() {
     <PageWrapper>
       <section className="auth-card parent-area-card min-w-0 flex-1" dir="rtl">
         <header className="parent-area-header">
-          <h1>האזור האישי למתנדב/ת</h1>
+          {isPersonalHome && <h1>האזור האישי למתנדב/ת</h1>}
           <button
             className="employee-home-button"
             type="button"
@@ -30,9 +33,11 @@ function VolunteerPA() {
             </svg>
           </button>
           
-          <Can role="volunteer">
-            <p>שלום {user?.fullName || user?.email || "מתנדב/ת"}.</p>
-          </Can>
+          {isPersonalHome && (
+            <Can role="volunteer">
+              <p>שלום {user?.fullName || user?.email || "מתנדב/ת"}.</p>
+            </Can>
+          )}
         </header>
         {location.state?.successMessage && (
           <p className="form-message success-message" role="status">

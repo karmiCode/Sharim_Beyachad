@@ -1,19 +1,13 @@
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../useAuth"
 import Can from "../Can"
 import PageWrapper from "../layout/PageWrapper"
 
-// Layout למתנדבת: NavLink משנה נתיב בלי טעינת דף, ו-Outlet מציג את תוכן נתיב-הבן.
-// הזהות והיציאה מגיעות מ-AuthContext ולא ממצב מקומי נפרד.
+// Layout למתנדבת: Outlet מציג את תוכן נתיב-הבן. הניווט והיציאה נמצאים בתפריט הכותרת (SiteHeader).
 function VolunteerPA() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, logout } = useAuth()
-
-  const signOut = () => {
-    logout()
-    navigate("/", { replace: true })
-  }
+  const { user } = useAuth()
 
   const returnToPersonalHome = () => {
     navigate("/personal", { replace: true })
@@ -45,25 +39,6 @@ function VolunteerPA() {
             {location.state.successMessage}
           </p>
         )}
-        <nav className="parent-nav" aria-label="ניווט באזור האישי">
-          <NavLink
-            to="events"
-            className={({ isActive }) =>
-              `parent-nav-link${isActive ? " active" : ""}`
-            }
-          >
-            אירועים
-          </NavLink>
-          <NavLink
-            to="volunteer-details"
-            className={({ isActive }) =>
-              `parent-nav-link${isActive ? " active" : ""}`
-            }
-          >
-            עדכון פרטים אישיים
-          </NavLink>
-          <button className="parent-nav-link" type="button" onClick={signOut}>יציאה</button>
-        </nav>
         <div className="parent-content min-w-0 w-full flex-1">
           <Outlet />
         </div>

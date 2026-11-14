@@ -10,6 +10,7 @@ import RegVolun from "./Registration/RegVolun"
 import RegChild from "./Parent/RegChild"
 import ParentEventsPage from "./Parent/ParentEventsPage"
 import ParentChildEditPage from "./Parent/ParentChildEditPage"
+import ChildrenUpdatePage from "./Parent/ChildrenUpdatePage"
 import UpdateParent from "./Parent/UpdateParent"
 import UpdateVolunteer from "./Volunteer/UpdateVolunteer"
 import PersonalEventsPage from "./PersonalEventsPage"
@@ -91,6 +92,7 @@ function App() {
               />
               <Route path="parent-details" element={<UpdateParent />} />
               {/* שאר פעולות ניהול הפרופיל והרישום לילדים מוגבלות להורה. */}
+              <Route path="children" element={<ChildrenUpdatePage />} />
               <Route
                 path="children/:childId/edit"
                 element={<ParentChildEditPage />}

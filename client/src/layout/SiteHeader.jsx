@@ -6,9 +6,13 @@ import LogoMark from "./LogoMark"
 const pillBase =
   "rounded-full px-4 py-2 text-base font-bold no-underline transition-colors"
 
-// קישור בתפריט: הדף הפעיל מודגש בכתום, ושאר הקישורים מקבלים רקע תכלת בריחוף.
+// קישור בתפריט: במסך רחב קו תחתון כתום לדף הפעיל (כמו באתרים), ובמסך צר כפתור עגול.
 const navLinkClass = ({ isActive }) =>
-  `${pillBase} ${isActive ? "bg-sun-100 text-sun-800" : "text-sea-800 hover:bg-sea-100"}`
+  `rounded-xl px-4 py-2 text-base font-bold no-underline transition-colors md:rounded-none md:border-b-[3px] md:px-3 ${
+    isActive
+      ? "bg-sun-100 text-sun-800 md:border-sun-500 md:bg-transparent"
+      : "text-sea-800 hover:bg-sea-100 md:border-transparent md:hover:border-sea-300 md:hover:bg-transparent"
+  }`
 
 /**
  * בונה את רשימת הקישורים לפי מי שמחובר.
@@ -30,6 +34,7 @@ function getMenuItems({ isAuthenticated, role, hasPermission }) {
       home,
       { to: "/personal/events", label: "אירועים" },
       { to: "/personal/reg-child", label: "רישום ילד" },
+      { to: "/personal/children", label: "עדכון פרטי ילד" },
       { to: "/personal/parent-details", label: "פרטי הורה" },
     ]
   }
@@ -149,7 +154,7 @@ function SiteHeader() {
         </Link>
 
         {/* תפריט במסך רחב */}
-        <nav aria-label="תפריט ראשי" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="תפריט ראשי" className="hidden items-center gap-3 md:flex">
           {links}
           {accountButton}
         </nav>

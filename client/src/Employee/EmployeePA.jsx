@@ -1,16 +1,9 @@
-import { Outlet, useLocation, useNavigate, NavLink } from "react-router-dom"
-import { useAuth } from "../useAuth"
-import Can from "../Can"
+import { Outlet, useLocation, useNavigate } from "react-router-dom"
 import PageWrapper from "../layout/PageWrapper"
 
 const EmployeePA = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { permissions, logout } = useAuth()
-  const signOut = () => {
-    logout()
-    navigate("/", { replace: true })
-  }
   
   const returnToEmployeeHome = () => {
     navigate("/personal", { replace: true })
@@ -38,62 +31,6 @@ const EmployeePA = () => {
         )}
 
         <p>חשבון זה כולל הרשאות ניהול.</p>
-
-
-        <nav className="parent-nav" aria-label="ניווט באזור האישי לעובד">
-          <NavLink
-            to="/personal/employee-details"
-            className={({ isActive }) =>
-              `parent-nav-link${isActive ? " active" : ""}`
-            }
-          >
-            עדכון פרטים אישיים
-          </NavLink>
-          <NavLink
-            to="/personal/all-events"
-            className={({ isActive }) =>
-              `parent-nav-link${isActive ? " active" : ""}`
-            }
-          >
-            כל האירועים
-          </NavLink>
-          <Can permission="events">
-            <NavLink
-              to="/personal/add-event"
-              className={({ isActive }) =>
-                `parent-nav-link${isActive ? " active" : ""}`
-              }
-            >
-              הוסף אירוע
-            </NavLink>
-          </Can>
-
-          <Can permission="employees">
-            <NavLink
-              to="/personal/employees-manage"
-              className={({ isActive }) =>
-                `parent-nav-link${isActive ? " active" : ""}`
-              }
-            >
-              ניהול עובדים
-            </NavLink>
-          </Can>
-
-          <Can permission="permissions">
-            <NavLink
-              to="/personal/permissions-manage"
-              className={({ isActive }) =>
-                `parent-nav-link${isActive ? " active" : ""}`
-              }
-            >
-              ניהול הרשאות
-            </NavLink>
-          </Can>
-
-          <button className="parent-nav-link" type="button" onClick={signOut}>
-            יציאה
-          </button>
-        </nav>
 
 
         <div className="parent-content min-w-0 w-full flex-1">

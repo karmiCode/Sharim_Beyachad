@@ -1,9 +1,7 @@
 const Permission = require("../models/Permission")
 const { isValidPassword, verifyPassword } = require("./password")
 
-const REGISTRATION_ACTION = "registation"
-
-// מאתר הרשאה לפי סיסמת הגישה ומקבל רק הרשאה ייחודית שמורשית לרישום עובדים.
+// מאתר הרשאה לפי סיסמת הגישה ומקבל רק הרשאה ייחודית (קוד שאינו שמור ביותר מהרשאה אחת).
 const findEmployeePermission = async (accessPassword) => {
     // דוחים סיסמאות ריקות או ארוכות מהמגבלה הנתמכת על ידי bcrypt.
     if (!isValidPassword(accessPassword)) return null
@@ -20,15 +18,12 @@ const findEmployeePermission = async (accessPassword) => {
 
     if (matchingPermissions.length !== 1) return null
 
-    const matchingPermission = matchingPermissions[0]
-    if (!matchingPermission.validActions.includes(REGISTRATION_ACTION)) return null
-    return matchingPermission
+    return matchingPermissions[0]
 }
 
 // כמו findEmployeePermission, אבל מחזיר גם סיבת כשל, כדי שהמשתמשת תדע מה לתקן:
 // "no-match"    - הקוד לא תואם לאף הרשאה.
 // "ambiguous"   - אותו קוד שמור ביותר מהרשאה אחת.
-// "no-register" - הקוד נכון, אך להרשאה אין את היכולת "הרשמה" (registation).
 const checkEmployeeAccessCode = async (accessPassword) => {
     if (!isValidPassword(accessPassword)) return { failure: "no-match" }
 
@@ -40,13 +35,11 @@ const checkEmployeeAccessCode = async (accessPassword) => {
 
     if (matching.length === 0) return { failure: "no-match" }
     if (matching.length > 1) return { failure: "ambiguous" }
-    if (!matching[0].validActions.includes(REGISTRATION_ACTION)) return { failure: "no-register" }
     return { permission: matching[0] }
 }
 
 const accessCodeFailureMessage = (failure) => ({
     ambiguous: "אותו קוד הרשאה שמור ביותר מהרשאה אחת. יש להחליף את הקוד באחת ההרשאות בניהול הרשאות.",
-    "no-register": "הקוד נכון, אבל להרשאה הזו אין את היכולת \"הרשמה\". יש להפעיל אותה בעריכת ההרשאה בניהול הרשאות.",
 }[failure])
 
 module.exports = { findEmployeePermission, checkEmployeeAccessCode, accessCodeFailureMessage }

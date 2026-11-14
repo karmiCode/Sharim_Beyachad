@@ -274,8 +274,6 @@ const AddEvent = ({ onClose }) => {
         </label>
       </div>
 
-      <fieldset className="soft-frame">
-        <legend>פרטים לפרסום באירוע</legend>
       <div className="form-field">
         <label htmlFor="event-detailing-parent">פרטים להורים</label>
         <textarea id="event-detailing-parent" name="detailingForParent" rows="4" required {...fieldProps("detailingForParent")} />
@@ -287,7 +285,6 @@ const AddEvent = ({ onClose }) => {
         <textarea id="event-detailing-volun" name="detailingForVolun" rows="4" required {...fieldProps("detailingForVolun")} />
         {fieldError("detailingForVolun")}
       </div>
-      </fieldset>
 
       {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
       {successMessage && <p className="form-message success-message" role="status">{successMessage}</p>}

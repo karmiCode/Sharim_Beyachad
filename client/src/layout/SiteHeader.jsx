@@ -130,7 +130,7 @@ function SiteHeader() {
   return (
     <header
       dir="rtl"
-      className="sticky top-0 z-[1] border-b-4 border-sun-300 bg-cream-50/95 backdrop-blur"
+      className="sticky top-0 z-[1] border-b-4 border-sun-300 bg-linear-to-l from-sea-50 via-cream-50 to-sun-50 backdrop-blur"
     >
       <div
         className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4"

@@ -71,3 +71,17 @@ export const EditIcon = () => (
     <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
   </svg>
 )
+
+// פח: מחיקה.
+export const TrashIcon = () => (
+  <svg {...base}>
+    <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6" />
+  </svg>
+)
+
+// פלוס: הוספה.
+export const PlusIcon = () => (
+  <svg {...base}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+)

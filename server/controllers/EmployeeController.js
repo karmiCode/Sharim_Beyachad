@@ -1,7 +1,7 @@
 const createModelController = require("./modelControllerFactory")
 const Employee = require("../models/Employee")
 const Permission = require("../models/Permission")
-const { findEmployeePermission } = require("../utils/employeePermission")
+const { checkEmployeeAccessCode, accessCodeFailureMessage } = require("../utils/employeePermission")
 const { getLoginLock, recordLoginFailure, clearLoginFailures } = require("../utils/loginRateLimiter")
 const { isValidPassword } = require("../utils/password")
 const mongoose = require("mongoose")
@@ -81,7 +81,7 @@ const employeeController = createModelController({
             }
         }
 
-        const permission = await findEmployeePermission(accessPassword)
+        const { permission, failure } = await checkEmployeeAccessCode(accessPassword)
         if (!permission) {
             // כשל אימות אינו מגיע ליצירת העובד, ונרשם לצורך החסימה הזמנית.
             const { key } = getLoginLock("employee-registration-access", ipAddress, "access")
@@ -95,7 +95,12 @@ const employeeController = createModelController({
                     }
                 }
             }
-            return { error: { status: 403, message: "סיסמת הרשאת הגישה אינה תקינה או אינה מורשית" } }
+            return {
+                error: {
+                    status: 403,
+                    message: accessCodeFailureMessage(failure) || "סיסמת הרשאת הגישה אינה תקינה או אינה מורשית",
+                }
+            }
         }
 
         // מסירים את סיסמת ההרשאה מהנתונים ושומרים את מזהה Permission המאומת.

@@ -92,8 +92,11 @@ function SiteHeader() {
 
   const signOut = () => {
     closeMenu()
+    // קודם מנווטים למסך הכניסה ורק אז מתנתקים: אחרת ProtectedRoute של העמוד הנוכחי
+    // מספיק לשמור אותו כ-"from", והכניסה הבאה (גם של חשבון אחר) הייתה מקפיצה אליו
+    // ומציגה "אין הרשאה" אם אין לחשבון החדש גישה לעמוד הזה.
+    navigate("/", { replace: true, state: null })
     logout()
-    navigate("/", { replace: true })
   }
 
   const links = items.map((item) => (

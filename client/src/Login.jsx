@@ -49,7 +49,11 @@ function Login() {
 
     try {
       await login(accountType, account.endpoint, credentials)
-      const destination = location.state?.from?.pathname || "/personal"
+      // חוזרים לעמוד שממנו הועפנו רק אם זה עמוד אמיתי באזור האישי; אחרת לאזור האישי.
+      const fromPath = location.state?.from?.pathname
+      const destination = fromPath && fromPath.startsWith("/personal") && fromPath !== "/personal"
+        ? fromPath
+        : "/personal"
       navigate(destination, { replace: true })
     } catch (error) {
       // במקרה של חסימה, מציג את זמן ההמתנה שהשרת מחזיר.

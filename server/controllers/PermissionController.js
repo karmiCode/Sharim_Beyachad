@@ -4,7 +4,7 @@ const Permission = require("../models/Permission")
 const Counter = require("../models/Counter")
 const { getJwtSecret } = require("../config/jwt")
 const { hashPassword, isValidPassword } = require("../utils/password")
-const { findEmployeePermission } = require("../utils/employeePermission")
+const { checkEmployeeAccessCode, accessCodeFailureMessage } = require("../utils/employeePermission")
 const { getLoginLock, recordLoginFailure, clearLoginFailures } = require("../utils/loginRateLimiter")
 
 const VALID_ACTIONS = ["permissions", "employees", "events", "matching", "registation", "payments"]
@@ -211,7 +211,7 @@ permissionController.verifyEmployeeAccess = async (req, res) => {
 
     try {
         // משווה את הקוד מול סיסמאות ההרשאה השמורות, ואז מאמת שההרשאה מצביעה לתפקיד עובד.
-        const permission = await findEmployeePermission(password)
+        const { permission, failure } = await checkEmployeeAccessCode(password)
         if (!permission) {
             recordLoginFailure(key)
             const lock = getLoginLock("employee-registration-access", ipAddress, "access")
@@ -222,7 +222,9 @@ permissionController.verifyEmployeeAccess = async (req, res) => {
                     retryAfterSeconds: lock.retryAfterSeconds
                 })
             }
-            return res.status(403).json({ message: "סיסמת הרשאת הגישה אינה מורשית" })
+            return res.status(403).json({
+                message: accessCodeFailureMessage(failure) || "סיסמת הרשאת הגישה אינה מורשית"
+            })
         }
 
         clearLoginFailures(key)

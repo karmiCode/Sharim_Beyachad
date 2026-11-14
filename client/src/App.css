@@ -1132,23 +1132,11 @@
   margin-top: 16px;
 }
 
-/* כל כרטיס בגוון אחר, כדי שהדפים יהיו צבעוניים ולא לבנים. */
-.parent-event-card:nth-of-type(3n + 1) {
-  background: var(--color-sea-50);
-  border-color: var(--color-sea-200);
-  border-inline-start-color: var(--color-sea-500);
-}
-
-.parent-event-card:nth-of-type(3n + 2) {
+/* כל הכרטיסים באותו גוון חם אחיד, שמתנגד יפה לרקע התכלת של הדף. */
+.parent-event-card {
   background: var(--color-sun-50);
   border-color: var(--color-sun-200);
   border-inline-start-color: var(--color-sun-400);
-}
-
-.parent-event-card:nth-of-type(3n) {
-  background: var(--color-blush-50);
-  border-color: var(--color-blush-200);
-  border-inline-start-color: var(--color-blush-400);
 }
 
 .form-field input:not([type="checkbox"]):not([type="file"]),
@@ -1160,4 +1148,69 @@
 .event-status-fields {
   background: var(--color-sun-50);
   border-color: var(--color-sun-200);
+}
+
+/* טפסים: טקסט גדול וברור, ותיבות טקסט צרות (לא מרוחות על כל הרוחב). */
+.form-field label {
+  font-size: 1.1rem;
+}
+
+.form-field small {
+  font-size: 0.95rem;
+}
+
+.form-field input:not([type="checkbox"]):not([type="file"]),
+.form-field select {
+  max-width: 380px;
+  min-height: 48px;
+  font-size: 1.1rem;
+}
+
+.form-field textarea {
+  max-width: 560px;
+  font-size: 1.1rem;
+}
+
+.form-field input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+}
+
+.form-grid .form-field input:not([type="checkbox"]):not([type="file"]) {
+  max-width: 100%;
+}
+
+.event-status-field,
+.event-status-field span {
+  font-size: 1.1rem;
+}
+
+.parent-content h2 {
+  margin: 0 0 16px;
+  color: var(--color-sea-800);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.auth-card h1,
+.auth-card .form-title {
+  font-size: 1.8rem;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.parent-event-card h3 {
+  font-size: 1.25rem;
+}
+
+.parent-event-card p {
+  font-size: 1.05rem;
 }

@@ -57,7 +57,7 @@ const UpdateEmployee = () => {
     return (
         <>
             <h2>עדכון פרטי עובד/ת</h2>
-            <form onSubmit={handleSubmit}>
+            <form className="registration-form-embedded" onSubmit={handleSubmit}>
                 <div className="form-field">
                     <label htmlFor="volunteer-fullName">שם משתמש:</label>
                     <input

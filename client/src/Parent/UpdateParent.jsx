@@ -50,7 +50,7 @@ const UpdateParent = () => {
     return (
       <>
         <h2>עדכון פרטי הורה</h2>
-        <form onSubmit={handleSubmit}>
+        <form className="registration-form-embedded" onSubmit={handleSubmit}>
             <div className="form-field">
                 <label htmlFor="email">אימייל:</label>
                 <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />

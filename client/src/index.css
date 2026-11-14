@@ -1,7 +1,68 @@
+/*
+ * Tailwind נטען בלי שכבת ה-preflight (האיפוס הגלובלי), כדי שהעיצוב הקיים של
+ * הטפסים, הרשימות והכפתורים ב-App.css לא ישתנה בלי כוונה.
+ * נטענים רק ה-theme (משתני הצבע) וה-utilities (מחלקות העזר כמו flex, gap-3).
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+ * פלטת "קיץ" של שרים ביחד: תכלת, כתום, ורוד ושמנת.
+ * כל צבע זמין גם כמחלקת Tailwind (bg-sea-500, text-sun-700...) וגם
+ * כמשתנה CSS (var(--color-sea-500)) לשימוש בקובץ App.css.
+ */
+@theme {
+  --font-sans: "Rubik", "Heebo", system-ui, Arial, sans-serif;
+
+  /* תכלת */
+  --color-sea-50: #f0f9fe;
+  --color-sea-100: #dcf1fb;
+  --color-sea-200: #bde5f6;
+  --color-sea-300: #8fd3ee;
+  --color-sea-400: #5cbde4;
+  --color-sea-500: #2fa5d8;
+  --color-sea-600: #1a89ba;
+  --color-sea-700: #166d96;
+  --color-sea-800: #165878;
+  --color-sea-900: #174a64;
+
+  /* כתום */
+  --color-sun-50: #fff7ed;
+  --color-sun-100: #ffebd4;
+  --color-sun-200: #ffd3a3;
+  --color-sun-300: #ffb86b;
+  --color-sun-400: #ff9d3d;
+  --color-sun-500: #f5821b;
+  --color-sun-600: #d96a0f;
+  --color-sun-700: #b0540f;
+  --color-sun-800: #8b4412;
+
+  /* ורוד */
+  --color-blush-50: #fff1f4;
+  --color-blush-100: #ffe1e8;
+  --color-blush-200: #ffc5d3;
+  --color-blush-300: #ff9db5;
+  --color-blush-400: #f87898;
+  --color-blush-500: #e8527c;
+  --color-blush-600: #c93a64;
+  --color-blush-700: #a32c4e;
+
+  /* שמנת */
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fff9ec;
+  --color-cream-200: #fdf0d5;
+
+  /* צבעי טקסט */
+  --color-ink: #1b3d52;
+  --color-ink-soft: #54707f;
+}
+
 :root {
-  font-family: Arial, sans-serif;
-  color: #17324d;
-  background: #f1f6fa;
+  --header-height: 76px;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-cream-50);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -18,6 +79,7 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }

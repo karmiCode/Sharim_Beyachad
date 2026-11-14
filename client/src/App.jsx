@@ -23,6 +23,8 @@ import ProtectedRoute from "./ProtectedRoute"
 import "./App.css"
 import UpdateEmployee from "./Employee/UpdateEmployee"
 import ManageEmployies from "./Employee/ManageEmployies"
+import SiteHeader from "./Layout/SiteHeader"
+import SummerBackground from "./Layout/SummerBackground"
 // ביטול או שמירה מוצלחת מפעילים onClose ומחזירים למסך העובד; בשגיאה הטופס נשאר פתוח,
 // כי AddEvent אינו מפעיל את ה־callback בכשל. replace מונע הוספת שלב להיסטוריה הישנה.
 function EmployeeAddEventRoute() {
@@ -53,6 +55,9 @@ function Unauthorized() {
 function App() {
   return (
     <BrowserRouter>
+      {/* הרקע והכותרת עם הלוגו מוצגים בכל העמודים, מחוץ ל-Routes. */}
+      <SummerBackground />
+      <SiteHeader />
       <Routes>
         {/* מסך כניסה יחיד המשותף לכל סוגי החשבונות. */}
         <Route path="/" element={<Login />} />

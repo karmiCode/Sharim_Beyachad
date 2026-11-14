@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { api, getErrorMessage } from "../api"
 import { childFields } from "./RegChild"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 const parentEditableFields = childFields.filter(
   (field) => !["status", "category", "notes", "img"].includes(field.name)
@@ -235,20 +235,11 @@ const UpdateChild = ({ child, onCancel, onSuccess, read, setToEdit, embedded = f
         </span>
       </div>
       {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
-      <div className="flex items-center gap-2">
+      <div className="icon-actions">
       {!toRead &&
-        <button
-          className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
-          type="submit"
-          disabled={isSubmitting}
-          aria-label={isSubmitting ? "שומר..." : "שמירת פרטי הילד"}
-          title={isSubmitting ? "שומר..." : "שמירת פרטי הילד"}
-        >
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-            <path d="M17 21v-8H7v8M7 3v5h8" />
-          </svg>
-        </button>}
+        <IconButton variant="save" label="שמירה" type="submit" disabled={isSubmitting}>
+<SaveIcon />
+</IconButton>}
       {toRead && <>
         <button className="primary-button" type="button" onClick={confirmClick}>אישור</button>
         <button

@@ -4,7 +4,7 @@ import { useAuth } from "../useAuth"
 import { api, getErrorMessage } from "../api"
 import RegChildToEvent from "../Child/RegChildToEvent"
 import IconButton from "../ui/IconButton"
-import { CancelIcon, CalendarXIcon, CalendarPlusIcon } from "../ui/icons"
+import { CancelIcon, CalendarXIcon, CalendarPlusIcon, SaveIcon } from "../ui/icons"
 
 /**
  * כרטיס אירוע משותף לתצוגת הורה ומתנדבת, אבל פעולות ההרשמה מופרדות לפי role.
@@ -172,7 +172,7 @@ const EventDetails = ({
                         >
                             <CalendarXIcon />
                         </IconButton>
-                        <p className="form-message success-message" role="status">
+                        <p className="registered-note" role="status">
                             נרשמת לאירוע.
                         </p>
                     </div>
@@ -194,13 +194,15 @@ const EventDetails = ({
                                 />
                             </div>
                             <div className="volunteer-registration-actions">
-                                <button
-                                    className={`primary-button volunteer-registration-button${volunteerRegistrationPending ? " is-pending" : ""}`}
+                                <IconButton
+                                    variant="save"
+                                    label={volunteerRegistrationPending ? "נרשמת..." : "שליחת הרשמה"}
                                     type="submit"
+                                    className={`volunteer-registration-button${volunteerRegistrationPending ? " is-pending" : ""}`}
                                     disabled={volunteerRegistrationPending}
                                 >
-                                    {volunteerRegistrationPending ? "נרשמת..." : "שליחת הרשמה"}
-                                </button>
+                                    <SaveIcon />
+                                </IconButton>
                                 <IconButton
                                     label="ביטול"
                                     onClick={() => setShowVolunteerRegistrationForm(false)}
@@ -238,17 +240,21 @@ const EventDetails = ({
             )}
             {/* ההורה ממשיך לזרימה המקורית: בחירת ילד והמשך לנתיב וטופס רישום הילד. */}
             {role === "parent" && event.registrationOpen && !selectedChildId ? (
-                <button
-                    onClick={handleRegistrationClick}
-                    className="primary-button"
-                    type="button"
-                    disabled={role === "parent" && (
-                        childrenLoading || Boolean(childrenError) || childrenForRegistration.length === 0
+                <>
+                    <IconButton
+                        variant="primary"
+                        label={childrenLoading ? "טוען ילדים..." : "הרשמה"}
+                        onClick={handleRegistrationClick}
+                        disabled={childrenLoading || Boolean(childrenError) || childrenForRegistration.length === 0}
+                    >
+                        <CalendarPlusIcon />
+                    </IconButton>
+                    {!childrenLoading && !childrenError && childrenForRegistration.length === 0 && (
+                        <p className="form-message error-message" role="alert">
+                            כדי להירשם לאירוע צריך קודם לרשום ילד באזור האישי.
+                        </p>
                     )}
-                >
-
-                    {role === "parent" && childrenLoading ? "טוען ילדים..." : "הרשמה"}
-                </button>
+                </>
             ) : role === "parent" && !event.registrationOpen ? (
                 <p>{event.registrationMessage}</p>
             ) : null}

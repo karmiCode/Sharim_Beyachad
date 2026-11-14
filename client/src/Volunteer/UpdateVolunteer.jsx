@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import { useAuth } from "../useAuth"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 /**
  * טופס עדכון הפרופיל של המתנדבת המחוברת.
@@ -145,25 +145,18 @@ const UpdateVolunteer = () => {
 
                 {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
                 <div className="volunteer-registration-actions">
-                    <IconButton
+                    <div className="icon-actions">
+<IconButton variant="save" label="שמירה" type="submit" disabled={isSubmitting}>
+<SaveIcon />
+</IconButton>
+<IconButton
                         label="ביטול"
                         onClick={() => navigate("/personal")}
                         disabled={isSubmitting}
                     >
                         <CancelIcon />
                     </IconButton>
-                    <button
-                        className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
-                        type="submit"
-                        disabled={isSubmitting}
-                        aria-label={isSubmitting ? "שומר..." : "שמירת פרטי מתנדבת"}
-                        title={isSubmitting ? "שומר..." : "שמירת פרטי מתנדבת"}
-                    >
-                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-                            <path d="M17 21v-8H7v8M7 3v5h8" />
-                        </svg>
-                    </button>
+</div>
                 </div>
             </form>
         </>

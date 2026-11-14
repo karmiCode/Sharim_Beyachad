@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 /**
  * קומפוננטת הרשמה כללית להורה, מתנדב ועובד.
@@ -709,20 +709,19 @@ function RegistrationForm({
           בזמן שליחה הכפתור מנוטרל.
           הטקסט משתנה בהתאם ל-isSubmitting.
         */}
-        <button
-          className="primary-button"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "שולח..." : "אישור הרשמה"}
-        </button>
+        <div className="icon-actions">
+          <IconButton variant="save" label="שמירה" type="submit" disabled={isSubmitting}>
+            <SaveIcon />
+          </IconButton>
+          {cancelPath && (
+            <IconButton label="ביטול" onClick={() => navigate(cancelPath)}>
+              <CancelIcon />
+            </IconButton>
+          )}
+        </div>
 
         {/* כפתור ניווט שאינו שולח את הטופס */}
-        {cancelPath ? (
-          <IconButton label="ביטול" onClick={() => navigate(cancelPath)}>
-            <CancelIcon />
-          </IconButton>
-        ) : (
+        {!cancelPath && (
           <button
             className="text-link"
             type="button"

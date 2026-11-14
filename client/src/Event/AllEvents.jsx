@@ -5,7 +5,7 @@ import { useAuth } from "../useAuth"
 import EventDetails from "./EventDetails"
 import Can from "../Can"
 import IconButton from "../ui/IconButton"
-import { EyeIcon } from "../ui/icons"
+import { EditIcon, EyeIcon } from "../ui/icons"
 
 const AllEvents = ({
     selectedEventId,
@@ -59,32 +59,28 @@ const AllEvents = ({
             )}
             {role === "employee"
                 ? events.map((event) => (
-                    <article key={event._id} className="parent-event-card relative !pt-14">
+                    <article key={event._id} className="parent-event-card">
                         <h3>{event.name}</h3>
                         <p><strong>תאריך:</strong> {new Date(event.date).toLocaleDateString("he-IL")}</p>
                         <p><strong>שעה:</strong> {event.hour}</p>
-                        {hasPermission("events") && (
-                            <button
-                                className="secondary-button !absolute !left-2 !top-2 !z-10 !h-8 !min-h-0 !w-8 !min-w-0 !rounded-md !p-1"
-                                type="button"
-                                aria-label="עריכת האירוע"
-                                title="עריכת האירוע"
-                                onClick={() => navigate(`/personal/event/${event._id}/edit`)}
-                            >
-                                <svg className="edit-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 2-1.66Z" />
-                                </svg>
-                            </button>
-                        )}
-
-                        <Can permissions={["events", "matching", "employees"]}>
-                            <IconButton
-                                label="צפייה בילדים ובמתנדבות לאירוע"
-                                onClick={() => navigate(`/EmployeePA/Matching/${event._id}`)}
-                            >
-                                <EyeIcon />
-                            </IconButton>
-                        </Can>
+                        <div className="icon-actions">
+                            {hasPermission("events") && (
+                                <IconButton
+                                    label="עריכת האירוע"
+                                    onClick={() => navigate(`/personal/event/${event._id}/edit`)}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                            )}
+                            <Can permissions={["events", "matching", "employees"]}>
+                                <IconButton
+                                    label="צפייה בילדים ובמתנדבות לאירוע"
+                                    onClick={() => navigate(`/EmployeePA/Matching/${event._id}`)}
+                                >
+                                    <EyeIcon />
+                                </IconButton>
+                            </Can>
+                        </div>
 
                     </article>
                 ))

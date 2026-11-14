@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 import { permissionActionLabels } from "./permissionActions"
 
 const NewPermission = () => {
@@ -75,8 +75,7 @@ const NewPermission = () => {
   }
 
   return (
-    <div className="page-shell">
-    <section dir="rtl" className="auth-card">
+    <section dir="rtl" className="registration-form-embedded">
       <h2>הרשאה חדשה</h2>
 
       {errorMessage && (
@@ -135,19 +134,21 @@ const NewPermission = () => {
           )}
         </fieldset>
 
-        <button
-          className="primary-button"
-          type="submit"
-          disabled={isSaving || isLoadingActions || availableActions.length === 0}
-        >
-          {isSaving ? "שומר..." : "אישור"}
-        </button>
-        <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
-          <CancelIcon />
-        </IconButton>
+        <div className="icon-actions">
+          <IconButton
+            variant="save"
+            label="שמירה"
+            type="submit"
+            disabled={isSaving || isLoadingActions || availableActions.length === 0}
+          >
+            <SaveIcon />
+          </IconButton>
+          <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
+            <CancelIcon />
+          </IconButton>
+        </div>
       </form>
     </section>
-    </div>
   )
 }
 

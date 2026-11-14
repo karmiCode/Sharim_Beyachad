@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { api, getErrorMessage } from "../api"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 const PermissionDetails = () => {
   const { permissionId } = useParams()
@@ -86,8 +86,7 @@ const PermissionDetails = () => {
   }
 
   return (
-    <div className="page-shell">
-    <section dir="rtl" className="auth-card">
+    <section dir="rtl" className="registration-form-embedded">
       {loading && <p role="status">טוען פרטי הרשאה...</p>}
 
       {errorMessage && (
@@ -135,21 +134,19 @@ const PermissionDetails = () => {
             </p>
           )}
 
-          <button
-            className="primary-button"
-            type="button"
-            onClick={handleApprove}
-            disabled={isSaving}
-          >
-            {isSaving ? "שומר..." : "אישור"}
-          </button>
         </>
       )}
-      <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
-        <CancelIcon />
-      </IconButton>
+      <div className="icon-actions">
+        {!loading && permission && (
+          <IconButton variant="save" label="שמירה" onClick={handleApprove} disabled={isSaving}>
+            <SaveIcon />
+          </IconButton>
+        )}
+        <IconButton label="ביטול" onClick={() => navigate("/personal/permissions-manage")}>
+          <CancelIcon />
+        </IconButton>
+      </div>
     </section>
-    </div>
   )
 };
 

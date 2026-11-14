@@ -3,7 +3,7 @@ import { api, getErrorMessage } from "../api"
 import { useNavigate } from "react-router-dom"
 import Can from "../Can"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 const ManageEmployies = () => {
     const [employees, setEmployees] = useState([])
@@ -249,30 +249,18 @@ const ManageEmployies = () => {
                                 )}
 
                                 <div className="matching-confirm-actions">
-                                    <IconButton
+                                    <div className="icon-actions">
+<IconButton variant="save" label="שמירה" onClick={handleSavePermission} disabled={ dialogLoading || isSavingPermission || !selectedPermissionId }>
+<SaveIcon />
+</IconButton>
+<IconButton
                                         label="ביטול"
                                         onClick={closeDialog}
                                         disabled={isSavingPermission}
                                     >
                                         <CancelIcon />
                                     </IconButton>
-                                    <button
-                                        className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
-                                        type="button"
-                                        onClick={handleSavePermission}
-                                        disabled={
-                                            dialogLoading ||
-                                            isSavingPermission ||
-                                            !selectedPermissionId
-                                        }
-                                        aria-label={isSavingPermission ? "שומר..." : "שמירת הרשאה"}
-                                        title={isSavingPermission ? "שומר..." : "שמירת הרשאה"}
-                                    >
-                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-                                            <path d="M17 21v-8H7v8M7 3v5h8" />
-                                        </svg>
-                                    </button>
+</div>
                                 </div>
                             </>
                         )}

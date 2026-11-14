@@ -3,7 +3,7 @@ import { useState } from "react"
 import { api, getErrorMessage } from "../api"
 import Can from "../Can"
 import IconButton from "../ui/IconButton"
-import { CancelIcon } from "../ui/icons"
+import { CancelIcon, SaveIcon } from "../ui/icons"
 
 const AddEvent = ({ onClose }) => {
   const [errorMessage, setErrorMessage] = useState("")
@@ -202,17 +202,14 @@ const AddEvent = ({ onClose }) => {
   return (
     <Can permission="events">
     <form
-      className="auth-card registration-card"
+      className="registration-card registration-form-embedded"
       onSubmit={handleSubmit}
       onInvalid={handleInvalid}
       dir="rtl"
     >
-      <h1>יצירת אירוע</h1>
-      {onClose && (
-        <IconButton label="סגירת טופס האירוע" onClick={onClose}>
-          <CancelIcon />
-        </IconButton>
-      )}
+      <h2 className="form-title">הוספת אירוע</h2>
+
+      <div className="form-grid">
 
       <div className="form-field">
         <label htmlFor="event-name">שם האירוע</label>
@@ -262,6 +259,8 @@ const AddEvent = ({ onClose }) => {
         {fieldError("SavedPlaces")}
       </div>
 
+      </div>
+
       <div className="event-status-fields">
         <label className="event-status-field" htmlFor="event-active">
           <span>האם האירוע פעיל</span>
@@ -275,6 +274,8 @@ const AddEvent = ({ onClose }) => {
         </label>
       </div>
 
+      <fieldset className="soft-frame">
+        <legend>פרטים לפרסום באירוע</legend>
       <div className="form-field">
         <label htmlFor="event-detailing-parent">פרטים להורים</label>
         <textarea id="event-detailing-parent" name="detailingForParent" rows="4" required {...fieldProps("detailingForParent")} />
@@ -286,22 +287,21 @@ const AddEvent = ({ onClose }) => {
         <textarea id="event-detailing-volun" name="detailingForVolun" rows="4" required {...fieldProps("detailingForVolun")} />
         {fieldError("detailingForVolun")}
       </div>
+      </fieldset>
 
       {errorMessage && <p className="form-message error-message" role="alert">{errorMessage}</p>}
       {successMessage && <p className="form-message success-message" role="status">{successMessage}</p>}
 
-      <button
-        className="primary-button !inline-flex !h-8 !min-h-0 !w-8 !min-w-0 !items-center !justify-center !rounded-md !p-1"
-        type="submit"
-        disabled={isSubmitting}
-        aria-label={isSubmitting ? "שומר..." : "הוספת האירוע"}
-        title={isSubmitting ? "שומר..." : "הוספת האירוע"}
-      >
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-          <path d="M17 21v-8H7v8M7 3v5h8" />
-        </svg>
-      </button>
+      <div className="icon-actions">
+        <IconButton variant="save" label="שמירה" type="submit" disabled={isSubmitting}>
+          <SaveIcon />
+        </IconButton>
+        {onClose && (
+          <IconButton label="סגירת טופס האירוע" onClick={onClose}>
+            <CancelIcon />
+          </IconButton>
+        )}
+      </div>
     </form>
     </Can>
   )

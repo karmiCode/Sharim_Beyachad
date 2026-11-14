@@ -1,7 +1,12 @@
+/*
+ * Tailwind ופלטת הצבעים נטענים פעם אחת, ב-App.css.
+ * כאן רק הגדרות בסיס כלליות: משתנה גובה הכותרת, פונט וצבע טקסט.
+ */
 :root {
-  font-family: Arial, sans-serif;
-  color: #17324d;
-  background: #f1f6fa;
+  --header-height: 76px;
+  font-family: var(--font-sans, "Rubik", Arial, sans-serif);
+  color: var(--color-ink, #1b3d52);
+  background: var(--color-cream-50, #fffdf8);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -18,6 +23,7 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }

@@ -1,11 +1,56 @@
 @import "tailwindcss";
 
+/*
+ * פלטת "קיץ" של שרים ביחד: תכלת, כתום, ורוד ושמנת.
+ * כל צבע זמין גם כמחלקת Tailwind (bg-sea-500, text-sun-700...) וגם
+ * כמשתנה CSS (var(--color-sea-500)) לשימוש בקובץ הזה.
+ */
+@theme {
+  --font-sans: "Rubik", "Heebo", system-ui, Arial, sans-serif;
+
+  --color-sea-50: #f0f9fe;
+  --color-sea-100: #dcf1fb;
+  --color-sea-200: #bde5f6;
+  --color-sea-300: #8fd3ee;
+  --color-sea-400: #5cbde4;
+  --color-sea-500: #2fa5d8;
+  --color-sea-600: #1a89ba;
+  --color-sea-700: #166d96;
+  --color-sea-800: #165878;
+  --color-sea-900: #174a64;
+
+  --color-sun-50: #fff7ed;
+  --color-sun-100: #ffebd4;
+  --color-sun-200: #ffd3a3;
+  --color-sun-300: #ffb86b;
+  --color-sun-400: #ff9d3d;
+  --color-sun-500: #f5821b;
+  --color-sun-600: #d96a0f;
+  --color-sun-700: #b0540f;
+  --color-sun-800: #8b4412;
+
+  --color-blush-50: #fff1f4;
+  --color-blush-100: #ffe1e8;
+  --color-blush-200: #ffc5d3;
+  --color-blush-300: #ff9db5;
+  --color-blush-400: #f87898;
+  --color-blush-500: #e8527c;
+  --color-blush-600: #c93a64;
+  --color-blush-700: #a32c4e;
+
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fff9ec;
+  --color-cream-200: #fdf0d5;
+
+  --color-ink: #1b3d52;
+  --color-ink-soft: #54707f;
+}
+
 .page-shell {
   display: grid;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   place-items: center;
   padding: 24px;
-  background: linear-gradient(145deg, #e4f2f2, #f5f7fb 55%, #e9eef8);
 }
 
 .auth-card.parent-area-card {
@@ -24,7 +69,7 @@
 
 .parent-area-header p {
   margin: 0;
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 .parent-nav {
@@ -33,9 +78,9 @@
   align-items: center;
   gap: 10px;
   padding: 12px;
-  border: 1px solid #d9e3ed;
-  border-radius: 14px;
-  background: #f5f9fb;
+  border: 1px solid var(--color-sea-200);
+  border-radius: 18px;
+  background: var(--color-sea-50);
 }
 
 .parent-nav-link {
@@ -44,9 +89,9 @@
   align-items: center;
   justify-content: center;
   padding: 10px 16px;
-  border: 1px solid #176f68;
-  border-radius: 9px;
-  background: #176f68;
+  border: 1px solid var(--color-sea-700);
+  border-radius: 999px;
+  background: var(--color-sea-700);
   color: #fff;
   cursor: pointer;
   font: inherit;
@@ -58,19 +103,19 @@
 
 .parent-nav-link:hover {
   transform: translateY(-1px);
-  border-color: #145b55;
-  background: #145b55;
+  border-color: var(--color-sea-800);
+  background: var(--color-sea-800);
   text-decoration: none;
 }
 
 .parent-nav-link.active {
-  border-color: #103f3b;
-  background: #103f3b;
+  border-color: var(--color-sun-700);
+  background: var(--color-sun-700);
   box-shadow: inset 0 0 0 1px #ffffff40;
 }
 
 .parent-nav-link:focus-visible {
-  outline: 3px solid #16847a66;
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 45%, transparent);
   outline-offset: 2px;
 }
 
@@ -86,19 +131,19 @@
 
 .parent-home-state {
   padding: 24px;
-  border: 1px solid #d9e3ed;
+  border: 1px solid var(--color-sea-200);
   border-radius: 12px;
-  background: #f8fbfd;
+  background: var(--color-cream-50);
 }
 
 .parent-home-state h2 {
   margin: 0 0 8px;
-  color: #17324d;
+  color: var(--color-ink);
 }
 
 .parent-home-state p {
   margin: 0;
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 .auth-card,
@@ -108,10 +153,14 @@
   gap: 16px;
   width: min(100%, 440px);
   padding: 32px;
-  border: 1px solid #d9e3ed;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 16px 48px #17324d1a;
+  border: 1px solid var(--color-sea-200);
+  /* פס צבעוני בראש הכרטיס (תכלת, כתום, ורוד): הרקע הצבעוני נראה דרך המסגרת העליונה השקופה. */
+  border-top: 6px solid transparent;
+  border-radius: 24px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(90deg, var(--color-sea-400), var(--color-sun-400), var(--color-blush-400)) border-box;
+  box-shadow: 0 16px 48px rgb(27 61 82 / 0.10);
 }
 
 .registration-card {
@@ -144,7 +193,7 @@
 .parent-events h2,
 .parent-event-card h3 {
   margin: 0;
-  color: #17324d;
+  color: var(--color-ink);
 }
 
 .manage-event,
@@ -158,7 +207,7 @@
 .matching-page h2,
 .matching-list h3 {
   margin: 0;
-  color: #17324d;
+  color: var(--color-ink);
 }
 
 .manage-event-form {
@@ -170,7 +219,7 @@
 .manage-event-form textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #bac9d6;
+  border: 1px solid var(--color-sea-300);
   border-radius: 8px;
   background: #fff;
   font: inherit;
@@ -179,8 +228,8 @@
 
 .manage-event-form input:focus,
 .manage-event-form textarea:focus {
-  border-color: #16847a;
-  outline: 3px solid #16847a22;
+  border-color: var(--color-sea-500);
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 18%, transparent);
 }
 
 .manage-event-registration-counts {
@@ -193,19 +242,19 @@
 .manage-event-registration-counts div {
   min-width: 180px;
   padding: 12px 16px;
-  border: 1px solid #d9e3ed;
+  border: 1px solid var(--color-sea-200);
   border-radius: 10px;
-  background: #f8fbfd;
+  background: var(--color-cream-50);
 }
 
 .manage-event-registration-counts dt {
-  color: #597082;
+  color: var(--color-ink-soft);
   font-weight: 700;
 }
 
 .manage-event-registration-counts dd {
   margin: 4px 0 0;
-  color: #17324d;
+  color: var(--color-ink);
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -251,8 +300,8 @@
 }
 
 .event-status-field input[type="checkbox"]:checked {
-  border-color: #176fdb;
-  background: #176fdb;
+  border-color: var(--color-sea-600);
+  background: var(--color-sea-600);
 }
 
 .event-status-field input[type="checkbox"]:checked::before {
@@ -260,7 +309,7 @@
 }
 
 .event-status-field input[type="checkbox"]:focus-visible {
-  outline: 3px solid #16847a66;
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 45%, transparent);
   outline-offset: 2px;
 }
 
@@ -271,7 +320,7 @@
 
 .matching-event-name {
   margin: 0;
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 /* מעצב פס לשוניות אופקי עם גלילה כאשר רוחב המסך אינו מספיק לכל האפשרויות. */
@@ -279,7 +328,7 @@
   display: flex;
   gap: 20px;
   overflow-x: auto;
-  border-bottom: 1px solid #d9e3ed;
+  border-bottom: 1px solid var(--color-sea-200);
   background: #fff;
 }
 
@@ -295,7 +344,7 @@
   border-bottom: 3px solid transparent;
   margin-bottom: -1px;
   background: transparent;
-  color: #597082;
+  color: var(--color-ink-soft);
   cursor: pointer;
   font: inherit;
   text-align: start;
@@ -303,18 +352,18 @@
 
 /* מדגיש לשונית בריחוף באמצעות הצבע הפעיל של הממשק. */
 .matching-tab:hover {
-  color: #176fdb;
+  color: var(--color-sun-700);
 }
 
 /* מסמן את הלשונית הפעילה בצבע טקסט ובקו תחתון כחול. */
 .matching-tab.is-active {
-  border-bottom-color: #176fdb;
-  color: #176fdb;
+  border-bottom-color: var(--color-sun-500);
+  color: var(--color-sun-700);
 }
 
 /* מציג מסגרת נראית בעת ניווט מקלדת לצורך נגישות. */
 .matching-tab:focus-visible {
-  outline: 3px solid #176fdb55;
+  outline: 3px solid color-mix(in srgb, var(--color-sun-500) 40%, transparent);
   outline-offset: -3px;
 }
 
@@ -326,16 +375,16 @@
   flex: 0 0 auto;
   place-items: center;
   border-radius: 6px;
-  background: #edf5f4;
-  color: #145b55;
+  background: var(--color-sea-100);
+  color: var(--color-sea-800);
   font-size: 19px;
   font-weight: 700;
 }
 
 /* מתאים את רקע האייקון לצבע הכחול כאשר הלשונית פעילה. */
 .matching-tab.is-active .matching-tab-icon {
-  background: #eaf2ff;
-  color: #176fdb;
+  background: var(--color-sun-100);
+  color: var(--color-sun-800);
 }
 
 /* מציג את כותרת הלשונית ואת כותרת המשנה בשתי שורות צפופות. */
@@ -347,13 +396,13 @@
 
 /* מצמצם את גודל כותרת המשנה ומציג אותה בגוון ניטרלי. */
 .matching-tab-copy small {
-  color: #718394;
+  color: var(--color-ink-soft);
   font-size: 12px;
 }
 
 /* משתמש בצבע הפעיל גם בכותרת המשנה כדי לשמור על היררכיה ברורה. */
 .matching-tab.is-active .matching-tab-copy small {
-  color: #176fdb;
+  color: var(--color-sun-700);
 }
 
 /* שומר על רוחב תקין של תוכן הלשונית ומפריד אותו מפס הניווט. */
@@ -371,7 +420,7 @@
 .matching-list {
   min-width: 0;
   padding-inline-start: 16px;
-  border-inline-start: 1px solid #d9e3ed;
+  border-inline-start: 1px solid var(--color-sea-200);
 }
 
 .matching-list:last-child {
@@ -399,8 +448,8 @@
 }
 
 .matching-participant.is-selected {
-  border-color: #16847a;
-  background: #e7f4f1;
+  border-color: var(--color-sun-400);
+  background: var(--color-sun-100);
 }
 
 .matching-participant-main {
@@ -415,7 +464,7 @@
 }
 
 .matching-assignment-label {
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 .matching-participant-actions {
@@ -441,8 +490,8 @@
   place-items: center;
   border: 0;
   border-radius: 6px;
-  background: #edf5f4;
-  color: #145b55;
+  background: var(--color-sea-100);
+  color: var(--color-sea-800);
   cursor: pointer;
   font-size: 20px;
   line-height: 1;
@@ -450,7 +499,7 @@
 
 .matching-icon-button:focus-visible,
 .matching-details-close:focus-visible {
-  outline: 3px solid #16847a55;
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 40%, transparent);
   outline-offset: 2px;
 }
 
@@ -466,10 +515,10 @@
   max-height: min(360px, calc(100vh - 24px));
   overflow: auto;
   padding: 14px;
-  border: 1px solid #bac9d6;
+  border: 1px solid var(--color-sea-300);
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 10px 28px #17324d2b;
+  box-shadow: 0 10px 28px rgb(27 61 82 / 0.17);
 }
 
 .matching-details-heading {
@@ -482,12 +531,12 @@
 .matching-details-heading h3 {
   margin: 0;
   overflow-wrap: anywhere;
-  color: #17324d;
+  color: var(--color-ink);
 }
 
 .matching-details-close {
-  background: #f1f6fa;
-  color: #17324d;
+  background: var(--color-cream-100);
+  color: var(--color-ink);
   font-size: 24px;
 }
 
@@ -503,7 +552,7 @@
 }
 
 .matching-detail-row dt {
-  color: #597082;
+  color: var(--color-ink-soft);
   font-size: 13px;
   font-weight: 700;
 }
@@ -562,7 +611,7 @@
 .matching-pair {
   min-width: 0;
   padding: 6px 10px;
-  border: 1px solid #d9e3ed;
+  border: 1px solid var(--color-sea-200);
   border-radius: 6px;
   background: #fff;
 }
@@ -577,22 +626,22 @@
 
 /* מפריד בין הילד למתנדבת בקו עדין, בלי לפצל את מסגרת הזוג. */
 .matching-pair-participants>li+li {
-  border-top: 1px solid #edf1f5;
+  border-top: 1px solid var(--color-sea-100);
 }
 
 /* מעצב הודעת מצב ריקה כאשר עדיין לא קיימים זוגות משובצים. */
 .matching-empty-state {
   margin: 12px 0 0;
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 .parent-event-card {
   display: grid;
   gap: 10px;
   padding: 16px;
-  border: 1px solid #d9e3ed;
+  border: 1px solid var(--color-sea-200);
   border-radius: 12px;
-  background: #f8fbfd;
+  background: var(--color-cream-50);
 }
 
 .parent-event-card p {
@@ -602,7 +651,27 @@
 .auth-card h1,
 .dialog-card h2 {
   margin: 0;
-  color: #17324d;
+  color: var(--color-sea-800);
+  font-weight: 800;
+}
+
+/* Tailwind מאפס את גודל הכותרות, ולכן הגדלים נקבעים כאן במפורש. */
+.auth-card h1 {
+  font-size: 1.9rem;
+  line-height: 1.25;
+}
+
+.auth-card h2,
+.dialog-card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.auth-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .form-field {
@@ -619,7 +688,7 @@
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
-  border: 1px solid #bac9d6;
+  border: 1px solid var(--color-sea-300);
   border-radius: 8px;
   background: #fff;
 }
@@ -628,7 +697,7 @@
   width: 20px;
   height: 20px;
   justify-self: start;
-  accent-color: #16847a;
+  accent-color: var(--color-sea-500);
 }
 
 .form-field input[type="file"] {
@@ -642,7 +711,7 @@
 }
 
 .form-field input[type="file"]::file-selector-button {
-  color: #17324d;
+  color: var(--color-ink);
   font-size: 14px;
   cursor: pointer;
 }
@@ -657,12 +726,12 @@
 
 .form-field input:focus,
 .form-field select:focus {
-  border-color: #16847a;
-  outline: 3px solid #16847a22;
+  border-color: var(--color-sea-500);
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 18%, transparent);
 }
 
 .form-field small {
-  color: #597082;
+  color: var(--color-ink-soft);
 }
 
 .primary-button,
@@ -670,17 +739,27 @@
   min-height: 44px;
   padding: 10px 16px;
   border: 0;
-  border-radius: 8px;
-  background: #176f68;
+  border-radius: 12px;
+  background: var(--color-sea-700);
   color: #fff;
   cursor: pointer;
   font-weight: 700;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--color-sea-800);
+  transform: translateY(-1px);
 }
 
 .secondary-button {
-  background: #edf5f4;
-  color: #145b55;
+  background: var(--color-sun-100);
+  color: var(--color-sun-800);
   text-align: right;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: var(--color-sun-200);
 }
 
 .employee-home-button {
@@ -694,8 +773,8 @@
   padding: 7px;
   border: 0;
   border-radius: 8px;
-  background: #edf5f4;
-  color: #145b55;
+  background: var(--color-sea-100);
+  color: var(--color-sea-800);
   cursor: pointer;
 }
 
@@ -713,7 +792,7 @@
 }
 
 .employee-home-button:focus-visible {
-  outline: 3px solid #16847a55;
+  outline: 3px solid color-mix(in srgb, var(--color-sea-500) 40%, transparent);
   outline-offset: 2px;
 }
 
@@ -759,14 +838,14 @@
 }
 
 .primary-button.active {
-  background: #145b55;
+  background: var(--color-sea-800);
 }
 
 .text-link {
   padding: 4px;
   border: 0;
   background: transparent;
-  color: #145b91;
+  color: var(--color-sea-700);
   cursor: pointer;
   text-decoration: underline;
 }
@@ -778,8 +857,8 @@
 }
 
 .error-message {
-  background: #fff0f0;
-  color: #9c2424;
+  background: var(--color-blush-50);
+  color: var(--color-blush-700);
 }
 
 .success-message {
@@ -794,7 +873,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: #10243388;
+  background: rgb(27 61 82 / 0.5);
 }
 
 .dialog-close {
@@ -805,8 +884,8 @@
   height: 36px;
   border: 0;
   border-radius: 50%;
-  background: #edf2f6;
-  color: #17324d;
+  background: var(--color-sea-100);
+  color: var(--color-ink);
   cursor: pointer;
   font-size: 24px;
 }
@@ -832,10 +911,10 @@
   /* במגע אין hover, לכן משאירים את פעולות השורה גלויות במסכים צרים. */
   .matching-participant-actions {
     opacity: 1;
+  }
 
-    .parent-nav-link {
-      flex: 1 1 calc(50% - 10px);
-    }
+  .parent-nav-link {
+    flex: 1 1 calc(50% - 10px);
   }
 
   .permission-actions-list {
